@@ -1,4 +1,4 @@
-.venv/
+﻿.venv/
 __pycache__/
 .pytest_cache/
 node_modules/
@@ -6,7 +6,7 @@ node_modules/
 worker/node_modules/
 .env
 # downloaded model files and raw data (re-fetchable)
-models/
+/models/
 data/raw/
 data/cache/
 bench/results/*.png
