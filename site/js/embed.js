@@ -51,12 +51,28 @@ export function capSharedWasmMemory(maxPages = ORT_MAX_MEMORY_PAGES) {
   WebAssembly.Memory = Capped;
 }
 
+/** Which step a load failed in, so phone reports say where (err.stage). */
+const staged = async (stage, f) => {
+  try { return await f(); } catch (e) {
+    const err = e instanceof Error ? e : new Error(String(e));
+    err.stage ??= stage;
+    throw err;
+  }
+};
+
+/** The Cache API stores Transformers.js and this file use. Clearing them makes the next load a clean download. */
+export const MODEL_CACHES = ['transformers-cache', 'experimental_transformers-hash-cache', STATIC_CACHE];
+export async function clearModelCaches() {
+  try { if (typeof caches !== 'undefined') for (const k of await caches.keys()) if (MODEL_CACHES.includes(k)) await caches.delete(k); }
+  catch { /* storage blocked */ }
+}
+
 async function loadOnnx(name, spec, onProgress, runtime) {
   capSharedWasmMemory();
   // 'lean' needs the page's import map: onnxruntime-web/webgpu and onnxruntime-common -> vendor/ort/ort.wasm.min.mjs
-  const tf = runtime === 'lean'
-    ? await import(`${TJS}transformers.web.min.js`)
-    : await import(`${TJS}transformers.min.js`);
+  const tf = await staged('library', () => (runtime === 'lean'
+    ? import(`${TJS}transformers.web.min.js`)
+    : import(`${TJS}transformers.min.js`)));
   const { pipeline, env } = tf;
   env.allowLocalModels = false;
   const wasm = env.backends.onnx.wasm;
@@ -66,10 +82,14 @@ async function loadOnnx(name, spec, onProgress, runtime) {
       mjs: new URL('ort/ort-wasm-simd-threaded.mjs', VENDOR).href,
       wasm: new URL('ort/ort-wasm-simd-threaded.wasm', VENDOR).href,
     };
+    // Load ORT's own files as plain files (the browser's HTTP cache covers repeat visits). Transformers.js would
+    // otherwise keep them in the Cache API and re-import the loader as a blob: module, which failed on the second
+    // visit on iOS 17 Safari ("Importing a module script failed", then "Load failed").
+    env.useWasmCache = false;
   }
   const files = new Map();
   let bytes = 0;
-  const extractor = await pipeline('feature-extraction', spec.repo, {
+  const extractor = await staged('model', () => pipeline('feature-extraction', spec.repo, {
     dtype: spec.dtype,
     ...(spec.revision && { revision: spec.revision }),
     device: 'wasm',
@@ -82,7 +102,7 @@ async function loadOnnx(name, spec, onProgress, runtime) {
         onProgress({ loaded, total });
       }
     },
-  });
+  }));
   return {
     name, dim: spec.dim, bytes: () => bytes,
     async embed(text) {

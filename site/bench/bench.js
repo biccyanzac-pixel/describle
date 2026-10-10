@@ -24,7 +24,7 @@ for (const fn of ['instantiate', 'instantiateStreaming']) {
 }
 const wasmBytes = () => [...memories].reduce((s, m) => s + m.buffer.byteLength, 0);
 
-import { MODELS, loadEmbedder, createScorer, topK } from '../js/embed.js';
+import { MODELS, loadEmbedder, createScorer, topK, clearModelCaches } from '../js/embed.js';
 import { loadVocab } from '../js/vocab.js';
 
 const $ = (id) => document.getElementById(id);
@@ -57,12 +57,15 @@ async function jsHeap() {
   return { total: null, how: 'none' };
 }
 
+let stage = 'start';
 async function run(name, runtime) {
   // minilm-l6 uses the game's real vocabulary (site/data, 25k rows); other models a random matrix of that size.
   const real = name === 'minilm-l6' && params.get('real') !== '0';
   let rows = Number(params.get('rows')) || 25024;
   const guesses = Number(params.get('guesses')) || 20;
+  stage = 'clues';
   const clues = (await (await fetch('clues.json')).json()).clues.map((c) => c[1]);
+  stage = 'loading the model';
   $('status').textContent = `Loading ${name} (${runtime})…`;
   $('bar').hidden = false;
   const t0 = performance.now();
@@ -78,6 +81,7 @@ async function run(name, runtime) {
   const fromHub = entries.some((e) => /huggingface\.co|hf\.co/.test(e.name));
   const transfer = entries.reduce((s, e) => s + (e.transferSize || 0), 0) + (fromHub ? downloaded : 0);
 
+  stage = 'first description';
   $('status').textContent = 'First description…';
   let t = performance.now();
   await emb.embed('a warm-up sentence to compile everything');
@@ -85,6 +89,7 @@ async function run(name, runtime) {
 
   const dim = emb.dim;
   let score, simd, vocabMs = 0, vocabBytes = 0;
+  stage = 'vocabulary';
   if (real) {
     $('status').textContent = 'Loading the vocabulary…';
     const tv = performance.now();
@@ -100,6 +105,7 @@ async function run(name, runtime) {
     score = (q) => topK(scorer.score(q), 5);
   }
   let lastTop = null;
+  stage = 'guesses';
 
   const embedMs = [], scoreMs = [], totalMs = [];
   for (let g = 0; g < guesses; g++) {
@@ -129,7 +135,7 @@ async function run(name, runtime) {
 
 function render() {
   const res = loadResults();
-  const cols = [['device', (r) => r.device], ['model', (r) => r.model], ['runtime', (r) => r.runtime], ['cold?', (r) => r.cold ? 'cold' : 'warm'],
+  const cols = [['device', (r) => r.device], ['visit', (r) => r.visit ?? ''], ['model', (r) => r.model], ['runtime', (r) => r.runtime], ['cold?', (r) => r.cold ? 'cold' : 'warm'],
     ['net MB', (r) => MB(r.transfer)], ['model MB', (r) => MB(r.modelBytes)], ['load ms', (r) => r.loadMs], ['1st ms', (r) => r.firstMs],
     ['embed ms', (r) => r.embedMedian], ['score ms', (r) => r.scoreMedian], ['simd', (r) => r.simd === false ? 'no' : 'yes'], ['guess ms', (r) => r.guessMedian], ['max', (r) => r.guessMax],
     ['WASM MB', (r) => MB(r.wasmBytes)], ['heap MB', (r) => r.heapBytes == null ? '–' : MB(r.heapBytes)]];
@@ -155,34 +161,47 @@ function links() {
   mk('minilm-l6', 'default', 'MiniLM-L6, default runtime');
 }
 
-$('clear').onclick = async () => {
-  try { for (const k of await caches.keys()) await caches.delete(k); $('status').textContent = 'Model cache cleared.'; }
-  catch (e) { $('status').textContent = `Couldn't clear: ${e.message}`; }
-};
+$('clear').onclick = async () => { await clearModelCaches(); $('status').textContent = 'Model cache cleared.'; };
 $('copy').onclick = async () => {
   const text = JSON.stringify(loadResults(), null, 1);
   try { await navigator.clipboard.writeText(text); $('status').textContent = 'Copied.'; }
   catch { $('out').hidden = false; $('out').textContent = text; $('status').textContent = 'Clipboard blocked: select the text below.'; }
 };
-$('forget').onclick = () => { saveResults([]); render(); };
+$('forget').onclick = () => { saveResults([]); render(); $('status').textContent = 'Results cleared.'; };
+
+// The one-tap phone test: ?phone=N runs MiniLM-L6 with the real vocabulary, then reloads itself (a repeat visit,
+// loading from the cache) until N visits are done.
+$('phone').href = '?model=minilm-l6&runtime=lean&auto=1&phone=1&of=3';
 
 links();
 render();
 if (params.get('model') && params.get('auto')) {
+  const visit = Number(params.get('phone')) || 0, of = Number(params.get('of')) || 0;
+  const label = visit ? `Visit ${visit} of ${of}: ` : '';
   try {
     const r = await run(params.get('model'), params.get('runtime') || 'lean');
+    if (visit) r.visit = `${visit}/${of}`;
     saveResults([...loadResults(), r]);
     render();
-    $('status').textContent = `Done: ${r.model}, ${r.cold ? 'cold' : 'warm'} load ${r.loadMs} ms, guess ${r.guessMedian} ms.`;
+    $('status').textContent = `${label}done: ${r.model}, load ${r.loadMs} ms, guess ${r.guessMedian} ms.`;
     window.__bench = r;
   } catch (e) {
-    $('status').textContent = `Failed: ${e.message}`;
-    // Saved too, so "Copy all results" reports failures (with what memory was asked for).
+    // Saved too, so "Copy all results" reports failures: which step, the message, the memory asked for.
     const fail = { when: new Date().toISOString(), device: device(), ua: navigator.userAgent, model: params.get('model'),
-      error: String(e?.message || e), memoryRequests: memoryRequests.join('; '), wasmBytes: wasmBytes() };
+      visit: visit ? `${visit}/${of}` : undefined, stage: e?.stage ?? stage, error: String(e?.message || e),
+      memoryRequests: memoryRequests.join('; '), wasmBytes: wasmBytes() };
     saveResults([...loadResults(), fail]);
     render();
+    // Start the next try from a clean download, as the game will.
+    await clearModelCaches();
+    $('status').textContent = `${label}failed while ${fail.stage}: ${fail.error}. The model cache has been cleared.`;
     window.__bench = { ...fail, error: String(e?.stack || e) };
   }
   $('bar').hidden = true;
+  if (visit && visit < of) {
+    $('status').textContent += ' Next visit in 2 seconds…';
+    setTimeout(() => location.replace(`?model=minilm-l6&runtime=lean&auto=1&phone=${visit + 1}&of=${of}`), 2000);
+  } else if (visit) {
+    $('status').textContent += ' All done: tap "Copy all results" and paste them back.';
+  }
 }

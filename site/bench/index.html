@@ -32,14 +32,23 @@
 <body>
 <main>
   <h1>Describle model bench</h1>
-  <p>Tap a model. It downloads (first time) or loads from cache (second time), then runs 20 guesses: embed a description
-    and score it against a vocabulary-sized matrix. Run each model twice: once cold, once warm. One model per page load.</p>
-  <div class="row" id="links"></div>
+  <p><b>Phone test:</b> tap <b>Forget results</b>, then <b>Run phone test</b>, and wait (about a minute; the page reloads
+    itself twice). When it says "All done", tap <b>Copy all results</b> and paste them back.</p>
   <div class="row">
-    <button id="clear">Clear model cache</button>
-    <button id="copy">Copy all results</button>
     <button id="forget">Forget results</button>
+    <a class="btn primary" id="phone" href="#">Run phone test</a>
+    <button id="copy">Copy all results</button>
   </div>
+  <div id="status"></div>
+  <progress id="bar" value="0" max="1" hidden></progress>
+  <div class="scroll"><table id="table"></table></div>
+  <pre id="out" hidden></pre>
+  <details>
+    <summary>Other runs</summary>
+    <p>One model per tap: the first run downloads, later runs load from the cache. MiniLM-L6 uses the game's real vocabulary.</p>
+    <div class="row" id="links"></div>
+    <div class="row"><button id="clear">Clear model cache</button></div>
+  </details>
   <div id="status"></div>
   <progress id="bar" value="0" max="1" hidden></progress>
   <div class="scroll"><table id="table"></table></div>
