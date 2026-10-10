@@ -36,9 +36,11 @@ export async function loadEmbedder(name, { onProgress = () => {}, runtime = 'lea
  * the browser reserves the whole maximum up front: fine on desktop, but iOS Safari refuses with
  * "RangeError: Out of memory" ("no available backend found"). WebAssembly lets the page supply a memory with a
  * *smaller* maximum than the module declares, so cap shared memories before ORT creates one.
- * MiniLM-L6 uses ~80 MB of it; 512 MB leaves 6x headroom.
+ * MiniLM-L6 uses ~80 MB of it (90 MB measured on an iPhone, with the vocabulary). 512 MB worked once, but on a
+ * quick reload iOS hadn't released the previous page's reservation yet and refused the next one, so 256 MB
+ * (3x headroom).
  */
-export const ORT_MAX_MEMORY_PAGES = 8192; // x 64 KB = 512 MB
+export const ORT_MAX_MEMORY_PAGES = 4096; // x 64 KB = 256 MB
 export function capSharedWasmMemory(maxPages = ORT_MAX_MEMORY_PAGES) {
   const Orig = WebAssembly.Memory;
   if (Orig.capped) return;
