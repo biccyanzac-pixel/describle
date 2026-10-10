@@ -133,7 +133,7 @@ async function run(name, runtime) {
   const result = {
     when: new Date().toISOString(), device: device(), ua: navigator.userAgent, model: name, runtime: MODELS[name].kind === 'static' ? 'static' : 'ort-1.18',
     threads: 1, isolated: self.crossOriginIsolated, cores: navigator.hardwareConcurrency,
-    modelBytes: emb.bytes(), downloaded, transfer, cachedBefore, hubRequests, loadMs: ms(loadMs), firstMs: ms(firstMs),
+    modelBytes: emb.bytes(), modelSource: emb.source ?? 'this site', downloaded, transfer, cachedBefore, hubRequests, loadMs: ms(loadMs), firstMs: ms(firstMs),
     embedMedian: +median(embedMs).toFixed(1), embedP95: +pct(embedMs, 0.95).toFixed(1),
     scoreMedian: +median(scoreMs).toFixed(1), guessMedian: +median(totalMs).toFixed(1), guessMax: +Math.max(...totalMs).toFixed(1),
     rows, dim, simd, matrixBytes: rows * dim, real, vocabMs: ms(vocabMs), vocabBytes,
