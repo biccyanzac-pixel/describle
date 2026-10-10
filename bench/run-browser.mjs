@@ -7,7 +7,7 @@ import { serve } from '../tools/serve.mjs';
 
 const PORT = 8082;
 const want = process.argv.slice(2).length ? process.argv.slice(2) : ['chrome', 'webkit'];
-const RUNS = [['minilm-l6', 'lean'], ['minilm-l3', 'lean'], ['potion-8m', 'lean'], ['minilm-l6', 'default']];
+const RUNS = [['minilm-l6', 'lean'], ['minilm-l3', 'lean'], ['potion-8m', 'lean']];
 const srv = await serve(PORT);
 const all = [];
 

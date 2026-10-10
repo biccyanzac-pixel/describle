@@ -48,3 +48,4 @@ console.log(`  as spec'd:     top-1 ${pct(res.spec.top1)}, top-5 ${pct(res.spec.
 console.log(`  leave-one-out: top-1 ${pct(res.loo.top1)}, top-5 ${pct(res.loo.top5)}`);
 for (const e of res.examples.slice(0, 12)) console.log(`  ${e.target} [${e.banned.join(', ')}] "${e.desc}" -> ${e.top.join(', ')}`);
 fs.writeFileSync('data/reference-test.json', JSON.stringify(res, null, 1));
+await E.close();

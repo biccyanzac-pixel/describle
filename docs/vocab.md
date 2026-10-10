@@ -8,7 +8,9 @@ Status: **waiting for your review.** Phase 3 (schedule) hasn't started.
 | `site/data/vectors-v1.bin` | 9.2 MB (barely compresses) | 25,024 int8 vectors: up to 2 senses for each of 15,000 words |
 | `site/data/vocab-v1.json` | 322 KB (~110 KB gzipped) | words, senses per word, sense usage counts, word frequency, guess settings, irregular forms, credits |
 
-First visit is now about **23.7 MB model + 3.5 MB runtime + 9.3 MB vocabulary ≈ 37 MB**, then cached. Phase 1 estimated 45 MB. On desktop Chrome, a guess takes **31 ms** (embedding 27 ms, scoring 4 ms) and the whole page uses **113 MB**. That's with the real files, measured by `site/bench/` (`bench/debug-one.mjs`).
+First visit is now about **23.7 MB model + 2.7 MB runtime + 9.3 MB vocabulary ≈ 36 MB**, then cached; Phase 1 estimated 45 MB. On an iPhone (iOS 17.7) a guess took **28 ms**: embedding 25 ms, scoring 3 ms against the real vocabulary.
+
+The vectors are computed by the game's own `site/js/embed.js` in headless Chrome, so they're exactly what a phone computes. WebKit reproduces them with cosine 1.000000 on all 301 clues (`bench/parity.mjs`, docs/model.md "Parity").
 
 ## The vocabulary (`pipeline/vocab.py`)
 These are the 15,000 most frequent English words (wordfreq) that pass every filter:
@@ -33,35 +35,36 @@ score(word) = max over the word's 2 most used senses k of
 ```
 - **What each sense vector embeds** is its definition followed by its synonyms, e.g. "a lightweight handheld collapsible canopy (parasol, sunshade)". That beat the plain definition and "category: definition" (2–3 more right first time on dev).
 - **Usage bias:** +0.02 · ln(1 + count). A sense used 100 times gets +0.09, a never-tagged one +0. This stops rare senses winning: eye→hip, nose→behind ("buttocks"), spoon→server.
-- **Frequency prior:** +0.04 per zipf point. A word as common as "dog" (zipf 5.2) gets +0.05 over a zipf-4 word. Without it, top-1 on dev drops from 58 to 54.
+- **Frequency prior:** +0.04 per zipf point. A word as common as "dog" (zipf 5.2) gets +0.05 over a zipf-4 word. Without it, top-1 on dev drops from 61 to 52.
 - **The word itself isn't embedded:** with sense counts in place it added nothing on any setting, and leaving it out saves 15k vectors (5.8 MB).
 - **Correct guess:** the top word is the target or a variant of it (same stem or an inflection, the same rule as the ban check). "emptiness" counts for "empty".
 
 ### How the weights were chosen (`pipeline/tune.mjs`)
 - **Clue sets:** I wrote 301 clues by hand in three sets, each clue in a player's voice and none containing its target (`data/clues-*.json`).
 - **Grid:** 576 settings, chosen **only on the dev set**. Each line below is the best dev result (right first / in top 5, of 101) with that one setting fixed:
-  - text: plus 58/78, hyper ("category: definition") 56/78, definition only 56/75
-  - senses per word: 2 → 58/78, 3 → 58/77, 6 → 57/77
-  - usage bias: 0 → 55/78, 0.02 → 58/78
-  - frequency prior: 0 → 54/79, 0.04 → 58/78
-  - vocabulary size, from a wider run: 10k 59/78, 12k 59/77, 15k 58/78, 20k 59/78. All within noise, so I kept the spec's 15k.
+  - text: plus 61/79, hyper ("category: definition") 56/77, definition only 55/75
+  - senses per word: 2 → 61/79, 3 → 61/77, 6 → 60/77
+  - usage bias: 0 → 55/78, 0.02 → 61/79
+  - frequency prior: 0 → 52/78, 0.04 → 61/79
+  - vocabulary size, from a wider run on the earlier vectors: 10k 59/78, 12k 59/77, 15k 58/78, 20k 59/78. All within noise, so I kept the spec's 15k.
 
 **Results** (right first / in the top 5):
 
 | | dev (tuned on) | test (held out) | test-2 (held out, never seen) |
 |---|---|---|---|
-| untuned (definitions, 3 senses, nothing else) | 37 / 72 | 24 / 52 | 26 / 43 |
-| **chosen** | 58 / 78 | **42 / 78** | **32 / 64** |
+| untuned (definitions, 3 senses, nothing else) | 35 / 71 | 29 / 57 | 24 / 42 |
+| **chosen** | 61 / 79 | **40 / 75** | **33 / 64** |
 
 - **Be honest about dev:** dev is optimistic, because it's the best of 576 tries on 101 clues.
 - **test** was scored once before the sense-count settings existed. Its misses (eye→hip, …) prompted them, so it's only nearly held out.
-- **test-2** was written after that and scored once, at the end. **The fair estimate for one first attempt is about 1 in 3 right first time and 2 in 3 in the top 5.** With 3 attempts and the top-5 feedback, players will do much better.
-- Most test-2 misses are near-synonyms that show as "close!": cake→cookie, artist→painter, beautiful→gorgeous, soft→gentle, ocean→sea, remember→memory.
-- A few are real gaps: duck→tweet, fork→cooker and bank→refuge. Phase 3's validation drops targets the model can't find.
+- **test-2** was written after that and has never been used to choose anything. It's been scored at each pipeline fix (batching, engine parity), and the same setting won on dev every time. Its scores moved only by ±1 (32/64, 32/65, 33/64).
+- **The fair estimate for one first attempt is about 1 in 3 right first time and 2 in 3 in the top 5.** With 3 attempts and the top-5 feedback, players will do much better.
+- Most test-2 misses are near-synonyms that show as "close!": cake→cookie, artist→painter, beautiful→excellent, soft→gentle, ocean→sea, funny→laughter.
+- A few are real gaps: crab→paw, fork→cooker and bank→refuge. Phase 3's validation drops targets the model can't find.
 
 ### The spec's quality test (`pipeline/reference-test.mjs`)
 - **Setup:** 200 common nouns (seed 41). Each description is the word's own first WordNet definition with the day's banned words and the target's forms removed, cut to 25 words.
-- **As spec'd: 81% right first time, 89% in the top 5.** This is optimistic, because that very definition is in the index.
+- **As spec'd: 80% right first time, 91% in the top 5.** This is optimistic, because that very definition is in the index.
 - **With that definition hidden:** 4% / 14%. This is too harsh, since with 2 senses per word hiding the first usually leaves an unrelated meaning.
 - **The hand-written held-out sets above are the fair measure.** Phase 3 reuses this test to validate every scheduled target.
 
@@ -92,7 +95,7 @@ Look-alikes stay allowed: season (son), early/year/heart (ear), category (cat), 
 ## Rebuild
 ```
 .venv/Scripts/python -m pipeline.vocab --size 20000   # data/vocab.json, irregular.json, vocab_rejected.json
-node pipeline/embed.mjs                               # data/cache/*.i8 (~20 min; skipped when the texts haven't changed)
+node pipeline/embed.mjs                               # data/cache/*.i8, in headless Chrome (~25 min; skipped when unchanged)
 node pipeline/tune.mjs --n 15000                      # data/tune.json
 node pipeline/build.mjs                               # site/data/vocab-v1.json + vectors-v1.bin
 node pipeline/reference-test.mjs                      # data/reference-test.json

@@ -1,4 +1,4 @@
-// Phase 1 model bench. ?model=<name>&runtime=lean|default&rows=46500&guesses=20&auto=1
+// Model bench. ?model=<name>&rows=25024&guesses=20&auto=1   (?phone=1&of=3: the one-tap phone test)
 // Results are kept in localStorage (so a phone can run several models and copy them all at once) and
 // exposed as window.__bench for bench/run-browser.mjs.
 
@@ -131,7 +131,7 @@ async function run(name, runtime) {
   }
   const heap = await jsHeap();
   const result = {
-    when: new Date().toISOString(), device: device(), ua: navigator.userAgent, model: name, runtime: MODELS[name].kind === 'static' ? 'static' : runtime,
+    when: new Date().toISOString(), device: device(), ua: navigator.userAgent, model: name, runtime: MODELS[name].kind === 'static' ? 'static' : 'ort-1.18',
     threads: 1, isolated: self.crossOriginIsolated, cores: navigator.hardwareConcurrency,
     modelBytes: emb.bytes(), downloaded, transfer, cachedBefore, hubRequests, loadMs: ms(loadMs), firstMs: ms(firstMs),
     embedMedian: +median(embedMs).toFixed(1), embedP95: +pct(embedMs, 0.95).toFixed(1),
@@ -169,7 +169,6 @@ function links() {
   mk('minilm-l6', 'lean', 'MiniLM-L6');
   mk('minilm-l3', 'lean', 'MiniLM-L3');
   mk('potion-8m', 'lean', 'potion-8M (static)');
-  mk('minilm-l6', 'default', 'MiniLM-L6, default runtime');
 }
 
 $('clear').onclick = async () => { await clearModelCaches(); $('status').textContent = 'Model cache cleared.'; };

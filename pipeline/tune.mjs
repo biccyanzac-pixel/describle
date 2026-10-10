@@ -27,18 +27,20 @@ for (const [k, f] of Object.entries(sets)) clues[k] = JSON.parse(fs.readFileSync
 
 // Cosines of every clue against every row, once.
 const E = await nodeEmbedder();
+const queries = {};
+for (const [set, list] of Object.entries(clues)) queries[set] = await E.batch(list.map((c) => c[1]));
+await E.close();
 const pre = {};
+for (const [set, list] of Object.entries(clues)) {
+  pre[set] = list.map(([target]) => ({
+    target, ti: index.get(target),
+    ok: new Set([index.get(target), ...vocab.flatMap((e, j) => (isVariant(e.w, target, irregular) ? [j] : []))]),
+  }));
+}
 for (const st of STYLES) {
   const sc = await createScorer(S, E.dim);
   sc.mat.set(new Int8Array(fs.readFileSync(`data/cache/${st}.i8`).buffer.slice(0)));
-  for (const [set, list] of Object.entries(clues)) {
-    const qs = await E.batch(list.map((c) => c[1]));
-    pre[set] ??= list.map(([target]) => ({
-      target, ti: index.get(target),
-      ok: new Set([index.get(target), ...vocab.flatMap((e, j) => (isVariant(e.w, target, irregular) ? [j] : []))]),
-    }));
-    pre[set].forEach((c, i) => { c[st] = Float32Array.from(sc.score(qs[i])); });
-  }
+  for (const set of Object.keys(clues)) pre[set].forEach((c, i) => { c[st] = Float32Array.from(sc.score(queries[set][i])); });
 }
 
 // minCount: rows after a word's first sense need at least this SemCor count, or they're left out.

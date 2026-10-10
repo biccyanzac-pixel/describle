@@ -32,10 +32,13 @@ test('the browser path reproduces the tuner on every clue set', { skip: !built &
   const { nodeEmbedder } = await import('../pipeline/node-embed.mjs');
   const tune = JSON.parse(fs.readFileSync(new URL('../data/tune.json', import.meta.url), 'utf8'));
   const V = await makeVocab(meta, bin);
-  const E = await nodeEmbedder();
-  for (const [set, expected] of [['dev', tune.dev], ['test', tune.test], ['test2', tune.test2]]) {
-    const clues = JSON.parse(fs.readFileSync(new URL(`../data/clues-${set}.json`, import.meta.url), 'utf8')).clues.filter(([t]) => V.index.has(t));
-    const qs = await E.batch(clues.map((c) => c[1]));
+  const E = await nodeEmbedder({ workers: 2 }); // headless Chrome running site/js/embed.js
+  const sets = [['dev', tune.dev], ['test', tune.test], ['test2', tune.test2]];
+  const clueSets = sets.map(([set]) => JSON.parse(fs.readFileSync(new URL(`../data/clues-${set}.json`, import.meta.url), 'utf8')).clues.filter(([t]) => V.index.has(t)));
+  const queries = [];
+  try { for (const clues of clueSets) queries.push(await E.batch(clues.map((c) => c[1]))); } finally { await E.close(); }
+  for (const [k, [set, expected]] of sets.entries()) {
+    const clues = clueSets[k], qs = queries[k];
     let top1 = 0, top5 = 0;
     clues.forEach(([target], i) => {
       const top = V.guess(qs[i]).top.map((t) => t.word);

@@ -1,8 +1,8 @@
 # Model choice (Phase 1)
 
-**Recommendation: `all-MiniLM-L6-v2`, int8 (Xenova's ONNX export, Apache-2.0), run by Transformers.js 4.3.1 on a lean ONNX Runtime setup (WASM-only build, one thread, served from our own site), with vocabulary scoring done by a small WASM SIMD kernel.**
+**Decision: `all-MiniLM-L6-v2`, int8 (Xenova's ONNX export, Apache-2.0, pinned to commit `751bff3…`), run in the browser directly on ONNX Runtime Web 1.18's single-threaded build, with @huggingface/tokenizers, and vocabulary scoring done by a small WASM SIMD kernel.**
 
-Status: **waiting for your review.** Nothing in Phase 2 has started. **iPhone numbers are still missing.** See "What's not measured yet" below.
+> **Updated after the iPhone tests (10 Oct 2026):** the setup first recommended here (Transformers.js 4.3 on a current ONNX Runtime) loaded once on an iPhone, then ran out of memory on most later visits. See "iPhone" below. The comparison tables are from the original desktop runs. The model choice stands; only the runtime changed.
 
 ## Candidates
 
@@ -60,26 +60,26 @@ arctic-xs has the same architecture and size as minilm-l6, so I only ran it in t
 
 **The vocabulary file is the next biggest download.** Phase 2 should cut it: 2 definitions per word instead of 3, dropping word vectors whose weight earns nothing, and possibly 15k → 12k words. Each of these shrinks memory too. At 20 Mbit/s mobile, 45 MB is ~18 s, so the loading screen must show progress (spec'd) and let the player read the rules meanwhile.
 
-## iPhone: the 4 GB memory reservation (found 2026-10-10)
-The first iPhone run failed at once with `no available backend found. ERR: [wasm] RangeError: Out of memory`, before any model was loaded.
-- **Cause:** every ONNX Runtime Web build (plain, asyncify, jsep) declares shared WASM memory with a 4 GB maximum (`node bench/wasm-memory.mjs <file.wasm>`). A shared memory can't be moved, so the browser reserves the whole maximum up front. iOS Safari won't reserve 4 GB for one tab.
-- **Fix:** `capSharedWasmMemory()` in `site/js/embed.js` wraps `WebAssembly.Memory` before ORT loads, and lowers the maximum of shared memories to 512 MB. WebAssembly allows a smaller maximum than the module declares, and MiniLM-L6 uses about 80 MB.
-- **Check:** `SIMULATE_IOS=1 node bench/debug-one.mjs minilm-l6 lean chrome` makes Chrome refuse shared memories over 1 GB, as iOS does. Without the cap it reproduces the iPhone error exactly; with it, it works. The bench's results now show the memory requested ("shared max 512 MB").
+## iPhone (owner's iPhone, iOS 17.7 Safari, 10 Oct 2026)
+The bench was published at https://biccyanzac-pixel.github.io/describle/bench/. Its "Run phone test" button does 3 visits with the real vocabulary and saves every result, failures included, for "Copy all results".
 
-## What's not measured yet: iPhone
-I can't run Safari on an iPhone from here, and this laptop's Wi-Fi is set to "Public", so the firewall blocks a phone from reaching the local server (I didn't change firewall settings). The bench page is phone-ready: tap a model, it runs 20 guesses, results stay on the page, and "Copy all results" puts them on the clipboard. It needs to be reachable over HTTPS (the Cache API only works on secure origins). Options:
-1. **Push the repo and publish `site/` to GitHub Pages now** (`biccyanzac-pixel.github.io/describle/bench/`), as Phase 4 will anyway. The bench page has no game content.
-2. Allow the local server through the firewall on a private network and use `http://192.168.1.166:8082/bench/`. Over plain http the Cache API is off, so only cold loads can be measured.
+**What happened, in order:**
+1. **Transformers.js + ORT 1.31 failed at once:** `no available backend found. ERR: [wasm] RangeError: Out of memory`. Every ORT Web build since 1.19 is multi-threaded only, and declares *shared* WASM memory with a 4 GB maximum (`node bench/wasm-memory.mjs <file.wasm>`). A shared memory can't move, so the browser reserves the whole maximum up front, and iOS won't reserve 4 GB.
+2. **Capping that maximum at 512 MB** (wrapping `WebAssembly.Memory`) **loaded once:** 4.4 s, 28–42 ms per guess.
+   - On a repeat visit it failed differently, with "Importing a module script failed" and then "Load failed". Transformers.js re-imports ORT's loader from the Cache API as a `blob:` module, so I turned that off (`useWasmCache = false`).
+   - After that, visits 1 and 2 worked and visit 3 ran out of memory again. That was a reload 2 s later.
+3. **Capping at 256 MB:** every visit ran out of memory, even the first. iOS appears to keep shared memory reserved after a page goes away, until Safari itself restarts.
+4. **Fix:** stop using shared memory at all. ORT Web **1.18.0** is the last release with a single-threaded build (`ort-wasm-simd.wasm`), which uses ordinary memory. GitHub Pages can't enable WASM threads anyway, so we never used more than one. That meant dropping Transformers.js in the browser, which needs a current ORT. `site/js/embed.js` now does what its pipeline did: tokenize (`@huggingface/tokenizers`), run the session, mean-pool over the tokens, normalise. That's ~60 lines.
+   - **Side benefits:** ORT's WASM is 2.7 MB gzipped instead of 3.5 MB. There's no jsDelivr, no import map, and no Mistral-key false positive.
 
-On the iPhone run, watch for: (a) any reload or "A problem repeatedly occurred" (Safari's out-of-memory kill) during the 20 guesses; (b) a warm load well under the cold one (Cache API works); (c) guess time. Expect ~2–4× the desktop figures, i.e. ~100–150 ms, which would be fine.
+**Parity: the offline vectors must be exactly what a phone computes.** `bench/parity.mjs chrome|webkit` embeds all 301 clues on the site and compares them with the offline pipeline. It also refuses any shared memory, as a strict stand-in for iOS, and the page loads fine. Two real differences turned up:
+1. **Batching.** The int8 model quantises activations with a scale taken over the *whole input tensor*. A text embedded in a padded batch of 64 came out slightly different from the same text alone: cosine down to 0.979, enough to flip a few guesses. The game embeds one description alone, so everything is now embedded one text per call (`createOnnxEmbedder` in `site/js/embed.js`).
+2. **Engine version.** Token ids matched Transformers.js on all 301 clues. But onnxruntime-node 1.30 (offline) and ORT Web 1.18 (browser) round the int8 arithmetic differently: cosine down to 0.991 on short texts like "feeling very cross and furious". ORT's browser build can't run in plain Node (its file-loading code is stripped out), so **the offline vectors are now computed by the game's own `embed.js` in headless Chrome** (`pipeline/browser-embed.mjs`: 6 Chrome instances in parallel, model files served from a local copy). Chrome and WebKit gave identical vectors to each other.
 
-If minilm-l6 can't hold memory on older iPhones, the fallback is potion-8m (23 MB total memory, instant). It's weaker but playable, and both kinds are already behind the same `loadEmbedder()` interface in `site/js/embed.js`.
+The vectors were rebuilt this way and the weights re-tuned (docs/vocab.md).
 
-## Hosting the model (decision for you)
-- **Hugging Face Hub (default):** free CDN, no GitHub Pages bandwidth used. It depends on HF staying up and the repo not changing. We'd pin a commit, and Transformers.js supports `revision`.
-- **Self-host in `site/models/`:** fully under our control, but each new player costs 24 MB of GitHub Pages' soft 100 GB/month, about 4,000 first-time players a month.
-
-I'd use HF pinned to a commit, with self-hosting as a one-line fallback.
+## Hosting the model (decided)
+The owner chose the Hugging Face Hub, pinned to a commit: free, and it doesn't use GitHub Pages bandwidth. The browser fetches `https://huggingface.co/Xenova/all-MiniLM-L6-v2/resolve/751bff3…/onnx/model_quantized.onnx` (and the tokenizer files), then keeps them in the Cache API (`describle-models-v1`). Phase 4 adds a fallback to a copy on GitHub Pages, used only if the Hub fails.
 
 ## Reproduce
 ```
@@ -90,4 +90,10 @@ node bench/run-browser.mjs chrome webkit             # -> bench/results/desktop-
 node bench/quality.mjs                               # -> bench/results/quality.json (~10 min/model)
 node bench/score-check.mjs                           # SIMD vs JS scoring
 ```
-Versions: @huggingface/transformers 4.3.1, onnxruntime-web 1.31.0-dev.20260914 (the version Transformers.js pins), @huggingface/tokenizers 0.2.0, Chrome 155 (headless), Playwright WebKit (1.64.0 build), Node 24.19. WordNet 3.0 via NLTK.
+iPhone and parity checks: `bench/phone-flow.mjs [webkit|chrome]` (the phone test's 3 visits in a persistent profile; `SIMULATE_IOS=1` refuses large shared memories), `bench/parity.mjs [chrome|webkit]`, `bench/parity-node.mjs`.
+
+Versions:
+- **In the browser (now):** onnxruntime-web 1.18.0, @huggingface/tokenizers 0.2.0.
+- **Offline:** @huggingface/transformers 4.3.1 on onnxruntime-node 1.30.
+- **The desktop tables above** were measured with Transformers.js 4.3.1 on onnxruntime-web 1.31.0-dev in the browser.
+- **Tools:** Chrome 155 (headless), Playwright WebKit (1.64.0 build), Node 24.19, WordNet 3.0 via NLTK.

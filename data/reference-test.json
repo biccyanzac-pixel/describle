@@ -1,10 +1,10 @@
 {
  "spec": {
-  "top1": 161,
-  "top5": 177
+  "top1": 160,
+  "top5": 181
  },
  "loo": {
-  "top1": 7,
+  "top1": 8,
   "top5": 27
  },
  "n": 200,
@@ -12,19 +12,19 @@
   {
    "target": "archives",
    "banned": [
-    "museum",
     "library",
+    "museum",
     "registrar",
-    "annals",
-    "memorabilia"
+    "chronicle",
+    "annals"
    ],
    "desc": "collection of records especially about an institution",
    "top": [
-    "register",
     "file",
     "archive",
-    "record",
-    "copy"
+    "register",
+    "school",
+    "record"
    ]
   },
   {
@@ -33,7 +33,7 @@
     "majority",
     "racial",
     "ethnicity",
-    "interracial",
+    "racist",
     "demographic"
    ],
    "desc": "a group of people who differ or politically from a larger group of which it is a part",
@@ -42,33 +42,33 @@
     "member",
     "country",
     "people",
-    "nation"
+    "ethnic"
    ]
   },
   {
    "target": "con",
    "banned": [
     "pro",
-    "scam",
     "convict",
+    "scam",
     "approve",
-    "contentious"
+    "criminal"
    ],
    "desc": "an argument opposed to a proposal",
    "top": [
     "debate",
-    "anti",
     "suggestion",
-    "pro",
-    "advice"
+    "anti",
+    "advice",
+    "pro"
    ]
   },
   {
    "target": "hunter",
    "banned": [
-    "hunting",
     "seeker",
     "scout",
+    "hunting",
     "sentinel",
     "fowler"
    ],
@@ -87,15 +87,15 @@
     "stall",
     "plaza",
     "shop",
-    "mall",
-    "hall"
+    "ballroom",
+    "mall"
    ],
    "desc": "a table in a restaurant or bar surrounded by two high backed benches",
    "top": [
-    "console",
     "kitchen",
     "table",
-    "cafe",
+    "console",
+    "bed",
     "counter"
    ]
   },
@@ -105,7 +105,7 @@
     "benefit",
     "wellbeing",
     "charity",
-    "wellness",
+    "philanthropy",
     "healthy"
    ],
    "desc": "governmental provision of economic assistance to persons in need",
@@ -132,15 +132,15 @@
     "weekly",
     "monthly",
     "quarterly",
-    "daily"
+    "circulation"
    ]
   },
   {
    "target": "bone",
    "banned": [
     "skeletal",
-    "skeleton",
     "marrow",
+    "skeleton",
     "ivory",
     "skull"
    ],
@@ -158,9 +158,9 @@
    "banned": [
     "sire",
     "dad",
+    "parent",
     "daddy",
-    "grandfather",
-    "parent"
+    "grandfather"
    ],
    "desc": "a male also used as a term of address to your",
    "top": [
@@ -177,52 +177,52 @@
     "agricultural",
     "farmland",
     "rural",
-    "cultivated",
-    "gardening"
+    "gardening",
+    "cultivated"
    ],
    "desc": "the practice of the land or raising stock",
    "top": [
     "agriculture",
     "get",
-    "agricultural",
-    "stocking",
-    "farm"
+    "institute",
+    "farm",
+    "estate"
    ]
   },
   {
    "target": "interface",
    "banned": [
     "interaction",
-    "system",
     "connection",
-    "chemistry",
-    "junction"
+    "system",
+    "overlap",
+    "network"
    ],
-   "desc": "a surface forming a common boundary between two things two objects or liquids or chemical phases",
+   "desc": "chemistry a surface forming a common boundary between two things two objects or liquids or chemical phases",
    "top": [
-    "edge",
-    "surface",
+    "mixture",
     "phase",
     "material",
-    "skin"
+    "stuff",
+    "surface"
    ]
   },
   {
    "target": "zero",
    "banned": [
     "number",
-    "nothing",
     "null",
     "nil",
-    "insignificant"
+    "nothing",
+    "trillion"
    ],
    "desc": "a quantity of no importance",
    "top": [
     "least",
     "nothing",
     "nix",
-    "nil",
-    "lesser"
+    "zip",
+    "nada"
    ]
   },
   {
@@ -232,33 +232,33 @@
     "transmitting",
     "mailing",
     "messenger",
-    "recipient"
+    "sent"
    ],
    "desc": "the act of causing something to go especially",
    "top": [
     "cause",
     "causation",
-    "let",
-    "making",
-    "send"
+    "send",
+    "causing",
+    "making"
    ]
   },
   {
    "target": "broadcasting",
    "banned": [
     "radio",
-    "channels",
-    "television",
     "wireless",
-    "communications"
+    "communications",
+    "television",
+    "channels"
    ],
    "desc": "a medium that disseminates via telecommunications",
    "top": [
     "radio",
     "wireless",
     "communications",
-    "transmit",
-    "broadcast"
+    "broadcast",
+    "transmit"
    ]
   },
   {
@@ -276,7 +276,7 @@
     "engine",
     "fuel",
     "turbine",
-    "energetic"
+    "car"
    ]
   },
   {
@@ -284,17 +284,17 @@
    "banned": [
     "trademark",
     "hallmark",
-    "generic",
     "manufacturer",
-    "product"
+    "product",
+    "generic"
    ],
    "desc": "a name given to a or service",
    "top": [
     "term",
-    "call",
     "use",
-    "useful",
-    "help"
+    "facility",
+    "call",
+    "useful"
    ]
   },
   {
@@ -302,8 +302,8 @@
    "banned": [
     "winery",
     "brandy",
-    "vintage",
     "vineyard",
+    "vintage",
     "champagne"
    ],
    "desc": "fermented juice of grapes especially",
@@ -321,13 +321,13 @@
     "cactus",
     "mango",
     "coco",
-    "pear",
-    "erica"
+    "peach",
+    "turkey"
    ],
    "desc": "a large monocotyledonous genus of pinnate leaved palms found in asia and africa",
    "top": [
-    "ash",
     "coco",
+    "ash",
     "rhino",
     "brake",
     "forest"
@@ -338,24 +338,24 @@
    "banned": [
     "accessibility",
     "convenience",
-    "usable",
     "standby",
-    "unavailable"
+    "unavailable",
+    "usable"
    ],
    "desc": "the quality of being at hand when needed",
    "top": [
     "accessibility",
     "good",
-    "importance",
     "enough",
-    "utility"
+    "importance",
+    "demanding"
    ]
   },
   {
    "target": "leg",
    "banned": [
-    "foot",
     "thigh",
+    "foot",
     "limb",
     "knee",
     "hip"
@@ -365,34 +365,34 @@
     "foot",
     "arm",
     "pes",
-    "person",
-    "hand"
+    "hand",
+    "person"
    ]
   },
   {
    "target": "guard",
    "banned": [
+    "watch",
     "monitor",
     "protector",
-    "watch",
-    "vigilant",
-    "supervise"
+    "spying",
+    "shield"
    ],
    "desc": "a person who keeps over something or someone",
    "top": [
     "slave",
-    "holder",
     "person",
-    "owner",
-    "lose"
+    "holder",
+    "lose",
+    "owner"
    ]
   },
   {
    "target": "honey",
    "banned": [
     "sweet",
-    "beloved",
     "dearest",
+    "beloved",
     "mead",
     "hive"
    ],
@@ -402,7 +402,7 @@
     "nectar",
     "gold",
     "yellow",
-    "mead"
+    "stain"
    ]
   },
   {
@@ -411,15 +411,15 @@
     "tweet",
     "roaring",
     "buzz",
-    "rattle",
-    "beep"
+    "beep",
+    "rattle"
    ],
    "desc": "a series of chirps",
    "top": [
     "tweet",
-    "cricket",
     "smart",
     "wow",
+    "cricket",
     "twitter"
    ]
   },
@@ -428,16 +428,16 @@
    "banned": [
     "crucial",
     "prominent",
-    "notable",
+    "monumental",
     "greatness",
-    "monumental"
+    "notable"
    ],
    "desc": "the quality of being and worthy of note",
    "top": [
     "good",
-    "significance",
     "best",
     "dignity",
+    "significance",
     "worthy"
    ]
   },
@@ -446,17 +446,17 @@
    "banned": [
     "collector",
     "accumulation",
+    "catalog",
     "corpus",
-    "collage",
-    "catalog"
+    "encyclopedia"
    ],
    "desc": "several things grouped together or considered as a whole",
    "top": [
     "combination",
-    "aggregation",
-    "accumulation",
     "group",
-    "crowd"
+    "accumulation",
+    "aggregation",
+    "analysis"
    ]
   }
  ],
