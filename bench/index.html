@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Describle model bench</title>
+  <!-- The 'lean' runtime: Transformers.js web build + ONNX Runtime's WASM-only bundle. -->
+  <script type="importmap">
+    { "imports": { "onnxruntime-web/webgpu": "../vendor/ort/ort.wasm.min.mjs", "onnxruntime-common": "../vendor/ort/ort.wasm.min.mjs" } }
+  </script>
+  <style>
+    :root { --bg: #fbf7f0; --surface: #fff; --ink: #14213d; --muted: #55607a; --border: #e6dfd2; --accent: #6a3fd1; }
+    @media (prefers-color-scheme: dark) { :root { --bg: #0f1424; --surface: #1a2135; --ink: #f4f1ea; --muted: #b6bed0; --border: #2c3550; --accent: #a98bff; } }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    main { max-width: 860px; margin: 0 auto; padding: 20px 16px 48px; }
+    h1 { font: 700 1.8rem/1.1 Georgia, serif; margin: 0 0 6px; }
+    p { color: var(--muted); margin: 6px 0; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+    a.btn, button { font: inherit; padding: 9px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface);
+      color: var(--ink); text-decoration: none; cursor: pointer; }
+    a.btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    #status { font-weight: 600; min-height: 1.5em; }
+    progress { width: 100%; height: 10px; }
+    .scroll { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; font-size: .85rem; font-variant-numeric: tabular-nums; }
+    th, td { border-bottom: 1px solid var(--border); padding: 5px 6px; text-align: right; white-space: nowrap; }
+    th:first-child, td:first-child { text-align: left; }
+    pre { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px; overflow-x: auto; font-size: .75rem; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Describle model bench</h1>
+  <p>Tap a model. It downloads (first time) or loads from cache (second time), then runs 20 guesses: embed a description
+    and score it against a vocabulary-sized matrix. Run each model twice: once cold, once warm. One model per page load.</p>
+  <div class="row" id="links"></div>
+  <div class="row">
+    <button id="clear">Clear model cache</button>
+    <button id="copy">Copy all results</button>
+    <button id="forget">Forget results</button>
+  </div>
+  <div id="status"></div>
+  <progress id="bar" value="0" max="1" hidden></progress>
+  <div class="scroll"><table id="table"></table></div>
+  <pre id="out" hidden></pre>
+</main>
+<script type="module" src="bench.js"></script>
+</body>
+</html>

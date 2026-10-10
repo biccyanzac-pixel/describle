@@ -1,0 +1,157 @@
+﻿// Phase 1 model bench. ?model=<name>&runtime=lean|default&rows=46500&guesses=20&auto=1
+// Results are kept in localStorage (so a phone can run several models and copy them all at once) and
+// exposed as window.__bench for bench/run-browser.mjs.
+
+// --- WASM memory: track every Memory the page creates or instantiates, so we can read its size on any browser.
+const memories = new Set();
+const OrigMemory = WebAssembly.Memory;
+WebAssembly.Memory = new Proxy(OrigMemory, { construct(T, args) { const m = new T(...args); memories.add(m); return m; } });
+const grab = (r) => {
+  const inst = r?.instance ?? r;
+  for (const v of Object.values(inst?.exports ?? {})) if (v instanceof OrigMemory) memories.add(v);
+  return r;
+};
+for (const fn of ['instantiate', 'instantiateStreaming']) {
+  const orig = WebAssembly[fn];
+  if (orig) WebAssembly[fn] = (...a) => orig.apply(WebAssembly, a).then(grab);
+}
+const wasmBytes = () => [...memories].reduce((s, m) => s + m.buffer.byteLength, 0);
+
+import { MODELS, loadEmbedder, createScorer, topK } from '../js/embed.js';
+
+const $ = (id) => document.getElementById(id);
+const params = new URLSearchParams(location.search);
+const STORE = 'describle:bench';
+const MB = (b) => (b / 1048576).toFixed(1);
+const ms = (x) => Math.round(x);
+const median = (a) => { const s = [...a].sort((x, y) => x - y); return s[Math.floor(s.length / 2)]; };
+const pct = (a, p) => { const s = [...a].sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.floor(s.length * p))]; };
+
+function loadResults() { try { return JSON.parse(localStorage.getItem(STORE) || '[]'); } catch { return []; } }
+function saveResults(r) { try { localStorage.setItem(STORE, JSON.stringify(r)); } catch { /* storage blocked */ } }
+
+function device() {
+  const ua = navigator.userAgent;
+  if (/iPhone|iPad/.test(ua)) { const m = ua.match(/OS (\d+)_(\d+)/); return m ? `iOS ${m[1]}.${m[2]}` : 'iOS'; }
+  if (/Android/.test(ua)) return 'Android';
+  if (/Edg\//.test(ua)) return 'Edge';
+  if (/Chrome\//.test(ua)) return 'Chrome';
+  if (/Safari\//.test(ua)) return 'Safari/WebKit';
+  if (/Firefox\//.test(ua)) return 'Firefox';
+  return 'other';
+}
+
+async function jsHeap() {
+  if (self.crossOriginIsolated && performance.measureUserAgentSpecificMemory) {
+    try { return { total: (await performance.measureUserAgentSpecificMemory()).bytes, how: 'uaMemory' }; } catch { /* not allowed */ }
+  }
+  if (performance.memory) return { total: performance.memory.usedJSHeapSize, how: 'jsHeap' };
+  return { total: null, how: 'none' };
+}
+
+async function run(name, runtime) {
+  const rows = Number(params.get('rows')) || 46500;   // ~15k words + ~31.5k definitions (bench/data/probe_vocab.json)
+  const guesses = Number(params.get('guesses')) || 20;
+  const clues = (await (await fetch('clues.json')).json()).clues.map((c) => c[1]);
+  $('status').textContent = `Loading ${name} (${runtime})â€¦`;
+  $('bar').hidden = false;
+  const t0 = performance.now();
+  let downloaded = 0;
+  const emb = await loadEmbedder(name, {
+    runtime,
+    onProgress: ({ loaded, total }) => { downloaded = Math.max(downloaded, loaded); $('bar').max = total || 1; $('bar').value = loaded; },
+  });
+  const loadMs = performance.now() - t0;
+  // Bytes the network actually delivered. Same-origin files report transferSize (0 for Cache API hits);
+  // Hugging Face responses report 0 (no Timing-Allow-Origin), so count the model bytes if they were fetched at all.
+  const entries = performance.getEntriesByType('resource');
+  const fromHub = entries.some((e) => /huggingface\.co|hf\.co/.test(e.name));
+  const transfer = entries.reduce((s, e) => s + (e.transferSize || 0), 0) + (fromHub ? downloaded : 0);
+
+  $('status').textContent = 'First descriptionâ€¦';
+  let t = performance.now();
+  await emb.embed('a warm-up sentence to compile everything');
+  const firstMs = performance.now() - t;
+
+  // A vocabulary-sized int8 matrix of random unit vectors (content doesn't matter for timing).
+  const dim = emb.dim;
+  const scorer = await createScorer(rows, dim, { simd: params.get('simd') !== '0' });
+  const mat = scorer.mat;
+  for (let i = 0; i < mat.length; i++) mat[i] = (Math.random() * 60 - 30) | 0;
+
+  const embedMs = [], scoreMs = [], totalMs = [];
+  for (let g = 0; g < guesses; g++) {
+    $('status').textContent = `Guess ${g + 1}/${guesses}â€¦`;
+    await new Promise((r) => setTimeout(r, 0)); // let the page paint, as the game would
+    const t1 = performance.now();
+    const q = await emb.embed(clues[g % clues.length]);
+    const t2 = performance.now();
+    topK(scorer.score(q), 5);
+    const t3 = performance.now();
+    embedMs.push(t2 - t1); scoreMs.push(t3 - t2); totalMs.push(t3 - t1);
+  }
+  const heap = await jsHeap();
+  const result = {
+    when: new Date().toISOString(), device: device(), ua: navigator.userAgent, model: name, runtime: MODELS[name].kind === 'static' ? 'static' : runtime,
+    threads: 1, isolated: self.crossOriginIsolated, cores: navigator.hardwareConcurrency,
+    modelBytes: emb.bytes(), downloaded, transfer, loadMs: ms(loadMs), firstMs: ms(firstMs),
+    embedMedian: +median(embedMs).toFixed(1), embedP95: +pct(embedMs, 0.95).toFixed(1),
+    scoreMedian: +median(scoreMs).toFixed(1), guessMedian: +median(totalMs).toFixed(1), guessMax: +Math.max(...totalMs).toFixed(1),
+    rows, dim, simd: scorer.simd, matrixBytes: mat.byteLength, wasmBytes: wasmBytes(), heapBytes: heap.total, heapHow: heap.how, guesses,
+  };
+  result.cold = result.downloaded > 0 && result.transfer > 1e6;
+  return result;
+}
+
+function render() {
+  const res = loadResults();
+  const cols = [['device', (r) => r.device], ['model', (r) => r.model], ['runtime', (r) => r.runtime], ['cold?', (r) => r.cold ? 'cold' : 'warm'],
+    ['net MB', (r) => MB(r.transfer)], ['model MB', (r) => MB(r.modelBytes)], ['load ms', (r) => r.loadMs], ['1st ms', (r) => r.firstMs],
+    ['embed ms', (r) => r.embedMedian], ['score ms', (r) => r.scoreMedian], ['simd', (r) => r.simd === false ? 'no' : 'yes'], ['guess ms', (r) => r.guessMedian], ['max', (r) => r.guessMax],
+    ['WASM MB', (r) => MB(r.wasmBytes)], ['heap MB', (r) => r.heapBytes == null ? 'â€“' : MB(r.heapBytes)]];
+  $('table').innerHTML = res.length
+    ? `<tr>${cols.map((c) => `<th>${c[0]}</th>`).join('')}</tr>` + res.map((r) => `<tr>${cols.map((c) => `<td>${c[1](r)}</td>`).join('')}</tr>`).join('')
+    : '';
+}
+
+function links() {
+  const cur = params.get('model');
+  const mk = (model, runtime, label) => {
+    const a = document.createElement('a');
+    a.className = 'btn' + (cur === model && (params.get('runtime') || 'lean') === runtime ? ' primary' : '');
+    a.href = `?model=${model}&runtime=${runtime}&auto=1`;
+    a.textContent = label;
+    $('links').append(a);
+  };
+  mk('minilm-l6', 'lean', 'MiniLM-L6');
+  mk('minilm-l3', 'lean', 'MiniLM-L3');
+  mk('potion-8m', 'lean', 'potion-8M (static)');
+  mk('minilm-l6', 'default', 'MiniLM-L6, default runtime');
+}
+
+$('clear').onclick = async () => {
+  try { for (const k of await caches.keys()) await caches.delete(k); $('status').textContent = 'Model cache cleared.'; }
+  catch (e) { $('status').textContent = `Couldn't clear: ${e.message}`; }
+};
+$('copy').onclick = async () => {
+  const text = JSON.stringify(loadResults(), null, 1);
+  try { await navigator.clipboard.writeText(text); $('status').textContent = 'Copied.'; }
+  catch { $('out').hidden = false; $('out').textContent = text; $('status').textContent = 'Clipboard blocked: select the text below.'; }
+};
+$('forget').onclick = () => { saveResults([]); render(); };
+
+links();
+render();
+if (params.get('model') && params.get('auto')) {
+  try {
+    const r = await run(params.get('model'), params.get('runtime') || 'lean');
+    saveResults([...loadResults(), r]);
+    render();
+    $('status').textContent = `Done: ${r.model}, ${r.cold ? 'cold' : 'warm'} load ${r.loadMs} ms, guess ${r.guessMedian} ms.`;
+    window.__bench = r;
+  } catch (e) {
+    $('status').textContent = `Failed: ${e.message}`;
+    window.__bench = { error: String(e?.stack || e) };
+  }
+  $('bar').hidden = true;
+}
