@@ -1,5 +1,6 @@
-ONNX Runtime Web 1.31.0-dev.20260914-8d85527a0 (https://github.com/microsoft/onnxruntime)
-Files: ort.wasm.min.mjs, ort-wasm-simd-threaded.mjs, ort-wasm-simd-threaded.wasm
+ONNX Runtime Web 1.18.0 (https://github.com/microsoft/onnxruntime)
+Files: ort.wasm.min.js (the npm package's dist/esm/ort.wasm.min.js) and ort-wasm-simd.wasm, the last release with a
+single-threaded build that uses ordinary (non-shared) WASM memory; see docs/model.md.
 
 MIT License
 
