@@ -1,56 +1,37 @@
 // Text -> unit-length vector, in the browser. Two kinds of model:
-//   onnx:   a small transformer run by Transformers.js on ONNX Runtime (WASM, one thread: GitHub Pages can't
-//           send the COOP/COEP headers that multi-threaded WASM needs).
+//   onnx:   a small transformer (MiniLM) run directly on ONNX Runtime Web 1.18, single-threaded. Its tokenizer is
+//           @huggingface/tokenizers; pooling and normalising are done here, exactly as Transformers.js's
+//           feature-extraction pipeline does them (the offline vectors are built with that pipeline).
 //   static: a model2vec table (one vector per token, averaged). No ONNX runtime at all, so a much smaller download.
-// Used by the game and by the Phase 1 bench (site/bench/).
+// Used by the game and by the bench (site/bench/).
+//
+// Why ORT 1.18 and not Transformers.js + a current ORT (docs/model.md, "iPhone"): every ORT release since 1.19 ships
+// only multi-threaded builds, which need *shared* WASM memory. iOS Safari reserves shared memory up front and was
+// slow to release it, so on an iPhone the model failed to load ("RangeError: Out of memory") on most visits after the
+// first. 1.18 is the last release with a single-threaded build (ort-wasm-simd.wasm), which uses ordinary memory.
 
 export const MODELS = {
   // The game's model (docs/model.md). Pinned to a commit so the vectors in site/data/ always match it.
-  'minilm-l6': { kind: 'onnx', repo: 'Xenova/all-MiniLM-L6-v2', revision: '751bff37182d3f1213fa05d7196b954e230abad9', dtype: 'q8', pooling: 'mean', dim: 384, licence: 'Apache-2.0' },
-  'minilm-l3': { kind: 'onnx', repo: 'Xenova/paraphrase-MiniLM-L3-v2', dtype: 'q8', pooling: 'mean', dim: 384, licence: 'Apache-2.0' },
-  'arctic-xs': { kind: 'onnx', repo: 'Snowflake/snowflake-arctic-embed-xs', dtype: 'q8', pooling: 'cls', dim: 384, licence: 'Apache-2.0' },
+  // file = what the browser loads; dtype = the same weights as Transformers.js names them (the offline pipeline).
+  'minilm-l6': { kind: 'onnx', repo: 'Xenova/all-MiniLM-L6-v2', revision: '751bff37182d3f1213fa05d7196b954e230abad9', file: 'onnx/model_quantized.onnx', dtype: 'q8', pooling: 'mean', dim: 384, licence: 'Apache-2.0' },
+  'minilm-l3': { kind: 'onnx', repo: 'Xenova/paraphrase-MiniLM-L3-v2', file: 'onnx/model_quantized.onnx', dtype: 'q8', pooling: 'mean', dim: 384, licence: 'Apache-2.0' },
+  'arctic-xs': { kind: 'onnx', repo: 'Snowflake/snowflake-arctic-embed-xs', file: 'onnx/model_quantized.onnx', dtype: 'q8', pooling: 'cls', dim: 384, licence: 'Apache-2.0' },
   'potion-8m': { kind: 'static', path: 'models/potion-base-8M/', dim: 256, licence: 'MIT' },
 };
 
 const VENDOR = new URL('../vendor/', import.meta.url);
-// Transformers.js comes from jsDelivr, pinned: GitHub's secret scanner mistakes some of its minified class names
-// for an API key and refuses the push, so it can't be vendored. ONNX Runtime (the big part) is still served from here.
-const TJS = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.3.1/dist/';
 const SITE = new URL('../', import.meta.url);
-const STATIC_CACHE = 'describle-models-v1';
+const MODEL_CACHE = 'describle-models-v1';
+const MAX_TOKENS = 128; // descriptions are at most 25 words
 
 /**
  * Load a model. onProgress({ loaded, total }) is called with byte counts summed over all files.
- * runtime: 'lean' = Transformers.js web build + ORT's WASM-only bundle (14 MB .wasm, served from this site);
- *          'default' = Transformers.js's own choice (27 MB asyncify .wasm from jsDelivr).
- * Returns { name, dim, embed(text) -> Float32Array, bytes }.
+ * Returns { name, dim, embed(text) -> Float32Array, embedBatch(texts), bytes() }.
  */
-export async function loadEmbedder(name, { onProgress = () => {}, runtime = 'lean' } = {}) {
+export async function loadEmbedder(name, { onProgress = () => {} } = {}) {
   const spec = MODELS[name];
   if (!spec) throw new Error(`Unknown model ${name}`);
-  return spec.kind === 'static' ? loadStatic(name, spec, onProgress) : loadOnnx(name, spec, onProgress, runtime);
-}
-
-/**
- * Every ONNX Runtime Web build declares shared WASM memory with a 4 GB maximum. A shared memory can't move, so
- * the browser reserves the whole maximum up front: fine on desktop, but iOS Safari refuses with
- * "RangeError: Out of memory" ("no available backend found"). WebAssembly lets the page supply a memory with a
- * *smaller* maximum than the module declares, so cap shared memories before ORT creates one.
- * MiniLM-L6 uses ~80 MB of it (90 MB measured on an iPhone, with the vocabulary). 512 MB worked once, but on a
- * quick reload iOS hadn't released the previous page's reservation yet and refused the next one, so 256 MB
- * (3x headroom).
- */
-export const ORT_MAX_MEMORY_PAGES = 4096; // x 64 KB = 256 MB
-export function capSharedWasmMemory(maxPages = ORT_MAX_MEMORY_PAGES) {
-  const Orig = WebAssembly.Memory;
-  if (Orig.capped) return;
-  function Capped(desc) {
-    if (desc?.shared && (desc.maximum ?? Infinity) > maxPages) desc = { ...desc, maximum: Math.max(maxPages, desc.initial ?? 0) };
-    return new Orig(desc);
-  }
-  Capped.prototype = Orig.prototype; // keeps `instanceof WebAssembly.Memory` working
-  Capped.capped = true;
-  WebAssembly.Memory = Capped;
+  return spec.kind === 'static' ? loadStatic(name, spec, onProgress) : loadOnnx(name, spec, onProgress);
 }
 
 /** Which step a load failed in, so phone reports say where (err.stage). */
@@ -62,68 +43,105 @@ const staged = async (stage, f) => {
   }
 };
 
-/** The Cache API stores Transformers.js and this file use. Clearing them makes the next load a clean download. */
-export const MODEL_CACHES = ['transformers-cache', 'experimental_transformers-hash-cache', STATIC_CACHE];
+/**
+ * Cache API stores that hold model files. Clearing them makes the next load a clean download.
+ * (The transformers-* ones are from earlier versions of this page; clearing them frees the space.)
+ */
+export const MODEL_CACHES = [MODEL_CACHE, 'transformers-cache', 'experimental_transformers-hash-cache'];
 export async function clearModelCaches() {
   try { if (typeof caches !== 'undefined') for (const k of await caches.keys()) if (MODEL_CACHES.includes(k)) await caches.delete(k); }
   catch { /* storage blocked */ }
 }
 
-async function loadOnnx(name, spec, onProgress, runtime) {
-  capSharedWasmMemory();
-  // 'lean' needs the page's import map: onnxruntime-web/webgpu and onnxruntime-common -> vendor/ort/ort.wasm.min.mjs
-  const tf = await staged('library', () => (runtime === 'lean'
-    ? import(`${TJS}transformers.web.min.js`)
-    : import(`${TJS}transformers.min.js`)));
-  const { pipeline, env } = tf;
-  env.allowLocalModels = false;
-  const wasm = env.backends.onnx.wasm;
-  wasm.numThreads = 1;
-  if (runtime === 'lean') {
-    wasm.wasmPaths = {
-      mjs: new URL('ort/ort-wasm-simd-threaded.mjs', VENDOR).href,
-      wasm: new URL('ort/ort-wasm-simd-threaded.wasm', VENDOR).href,
-    };
-    // Load ORT's own files as plain files (the browser's HTTP cache covers repeat visits). Transformers.js would
-    // otherwise keep them in the Cache API and re-import the loader as a blob: module, which failed on the second
-    // visit on iOS 17 Safari ("Importing a module script failed", then "Load failed").
-    env.useWasmCache = false;
-  }
+/** Sums byte progress over several files into one onProgress({ loaded, total }). */
+function progressOver(onProgress) {
   const files = new Map();
-  let bytes = 0;
-  const extractor = await staged('model', () => pipeline('feature-extraction', spec.repo, {
-    dtype: spec.dtype,
-    ...(spec.revision && { revision: spec.revision }),
-    device: 'wasm',
-    progress_callback: (e) => {
-      if (e.status === 'progress' && e.file) {
-        files.set(e.file, { loaded: e.loaded ?? 0, total: e.total ?? 0 });
-        let loaded = 0, total = 0;
-        for (const f of files.values()) { loaded += f.loaded; total += f.total; }
-        bytes = total;
-        onProgress({ loaded, total });
-      }
-    },
-  }));
-  return {
-    name, dim: spec.dim, bytes: () => bytes,
-    async embed(text) {
-      const out = await extractor(text, { pooling: spec.pooling, normalize: true });
-      return Float32Array.from(out.data);
-    },
-    async embedBatch(texts) {
-      const out = await extractor(texts, { pooling: spec.pooling, normalize: true });
-      const d = spec.dim, res = [];
-      for (let i = 0; i < texts.length; i++) res.push(Float32Array.from(out.data.subarray(i * d, (i + 1) * d)));
-      return res;
-    },
+  return (name) => (loaded, total) => {
+    files.set(name, { loaded, total });
+    let l = 0, t = 0;
+    for (const f of files.values()) { l += f.loaded; t += f.total; }
+    onProgress({ loaded: l, total: t });
   };
+}
+
+let ortPromise = null;
+function loadOrt() {
+  ortPromise ??= import(new URL('ort/ort.wasm.min.js', VENDOR).href).then((ort) => {
+    ort.env.wasm.wasmPaths = new URL('ort/', VENDOR).href; // -> ort-wasm-simd.wasm
+    ort.env.wasm.numThreads = 1;                           // the single-threaded build: ordinary WASM memory
+    ort.env.wasm.proxy = false;
+    return ort;
+  });
+  return ortPromise;
+}
+
+export const hubUrl = (spec, file) => `https://huggingface.co/${spec.repo}/resolve/${spec.revision ?? 'main'}/${file}`;
+
+async function loadOnnx(name, spec, onProgress) {
+  const ort = await staged('library', loadOrt);
+  const { Tokenizer } = await staged('library', () => import(new URL('tokenizers/tokenizers.min.mjs', VENDOR).href));
+  const prog = progressOver(onProgress);
+  const files = ['tokenizer.json', 'tokenizer_config.json', spec.file];
+  const bufs = await staged('download', () => Promise.all(files.map((f) => fetchCached(hubUrl(spec, f), prog(f)))));
+  const dec = new TextDecoder();
+  const core = await staged('model', () => createOnnxEmbedder({
+    ort, Tokenizer, spec, modelBytes: new Uint8Array(bufs[2]),
+    tokenizerJson: JSON.parse(dec.decode(bufs[0])), tokenizerConfig: JSON.parse(dec.decode(bufs[1])),
+  }));
+  const bytes = bufs.reduce((s, b) => s + b.byteLength, 0);
+  return { name, ...core, bytes: () => bytes };
+}
+
+/**
+ * The embedding itself, shared by the browser (above) and the offline pipeline (pipeline/node-embed.mjs, which
+ * passes in the very same ort.wasm.min.js), so the shipped vectors are exactly what a phone computes.
+ * One text per model call, always: the int8 model quantises activations with a scale taken over the whole input,
+ * so padding a text into a batch changes its vector (docs/model.md, "Parity").
+ */
+export async function createOnnxEmbedder({ ort, Tokenizer, spec, modelBytes, tokenizerJson, tokenizerConfig }) {
+  const tok = new Tokenizer(tokenizerJson, tokenizerConfig);
+  const session = await ort.InferenceSession.create(modelBytes, { executionProviders: ['wasm'], graphOptimizationLevel: 'all' });
+  const D = spec.dim;
+  const hasTypes = session.inputNames.includes('token_type_ids');
+  async function embed(text) {
+    let ids = tok.encode(String(text)).ids;
+    if (ids.length > MAX_TOKENS) ids = [...ids.slice(0, MAX_TOKENS - 1), ids.at(-1)]; // keep [SEP] last
+    const L = ids.length;
+    const feeds = {
+      input_ids: new ort.Tensor('int64', BigInt64Array.from(ids, BigInt), [1, L]),
+      attention_mask: new ort.Tensor('int64', new BigInt64Array(L).fill(1n), [1, L]),
+    };
+    if (hasTypes) feeds.token_type_ids = new ort.Tensor('int64', new BigInt64Array(L), [1, L]);
+    const out = await session.run(feeds);
+    const h = out[session.outputNames[0]].data; // last_hidden_state [1, L, D]
+    const v = new Float32Array(D);
+    if (spec.pooling === 'cls') for (let j = 0; j < D; j++) v[j] = h[j];
+    else {
+      for (let i = 0; i < L; i++) for (let j = 0; j < D; j++) v[j] += h[i * D + j];
+      for (let j = 0; j < D; j++) v[j] /= L;
+    }
+    return unit(v);
+  }
+  async function embedBatch(texts) {
+    const res = [];
+    for (const t of texts) res.push(await embed(t));
+    return res;
+  }
+  return { dim: D, embed, embedBatch };
+}
+
+function unit(v) {
+  let n = 0;
+  for (let j = 0; j < v.length; j++) n += v[j] * v[j];
+  n = Math.sqrt(n) || 1;
+  for (let j = 0; j < v.length; j++) v[j] /= n;
+  return v;
 }
 
 /** Fetch with byte progress, through the Cache API when the browser has it (it doesn't on plain http). */
 export async function fetchCached(url, onBytes = () => {}) {
   let cache = null;
-  try { if (typeof caches !== 'undefined') cache = await caches.open(STATIC_CACHE); } catch { /* private mode etc. */ }
+  try { if (typeof caches !== 'undefined') cache = await caches.open(MODEL_CACHE); } catch { /* private mode etc. */ }
   let res = cache && await cache.match(url).catch(() => null);
   const fromCache = !!res;
   if (!res) {
