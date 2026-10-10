@@ -9,6 +9,19 @@ const browser = which === 'chrome'
   ? await chromium.launch({ executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true })
   : await webkit.launch({ headless: true });
 const page = await browser.newPage();
+// SIMULATE_IOS=1: refuse shared WASM memories with a maximum over 1 GB, as iOS Safari does
+// ("RangeError: Out of memory"), to check that embed.js's cap gets in first.
+if (process.env.SIMULATE_IOS) {
+  await page.addInitScript(() => {
+    const Orig = WebAssembly.Memory;
+    const Strict = function (d) {
+      if (d?.shared && (d.maximum ?? 65536) > 16384) throw new RangeError('Out of memory');
+      return new Orig(d);
+    };
+    Strict.prototype = Orig.prototype;
+    WebAssembly.Memory = Strict;
+  });
+}
 page.on('console', (m) => console.log(`[${m.type()}] ${m.text()}`));
 page.on('pageerror', (e) => console.log(`[pageerror] ${e.message}`));
 page.on('requestfailed', (r) => console.log(`[requestfailed] ${r.url()} ${r.failure()?.errorText}`));

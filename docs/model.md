@@ -60,6 +60,12 @@ arctic-xs has the same architecture and size as minilm-l6, so I only ran it in t
 
 **The vocabulary file is the next biggest download.** Phase 2 should cut it: 2 definitions per word instead of 3, dropping word vectors whose weight earns nothing, and possibly 15k → 12k words. Each of these shrinks memory too. At 20 Mbit/s mobile, 45 MB is ~18 s, so the loading screen must show progress (spec'd) and let the player read the rules meanwhile.
 
+## iPhone: the 4 GB memory reservation (found 2026-10-10)
+The first iPhone run failed at once with `no available backend found. ERR: [wasm] RangeError: Out of memory`, before any model was loaded.
+- **Cause:** every ONNX Runtime Web build (plain, asyncify, jsep) declares shared WASM memory with a 4 GB maximum (`node bench/wasm-memory.mjs <file.wasm>`). A shared memory can't be moved, so the browser reserves the whole maximum up front. iOS Safari won't reserve 4 GB for one tab.
+- **Fix:** `capSharedWasmMemory()` in `site/js/embed.js` wraps `WebAssembly.Memory` before ORT loads, and lowers the maximum of shared memories to 512 MB. WebAssembly allows a smaller maximum than the module declares, and MiniLM-L6 uses about 80 MB.
+- **Check:** `SIMULATE_IOS=1 node bench/debug-one.mjs minilm-l6 lean chrome` makes Chrome refuse shared memories over 1 GB, as iOS does. Without the cap it reproduces the iPhone error exactly; with it, it works. The bench's results now show the memory requested ("shared max 512 MB").
+
 ## What's not measured yet: iPhone
 I can't run Safari on an iPhone from here, and this laptop's Wi-Fi is set to "Public", so the firewall blocks a phone from reaching the local server (I didn't change firewall settings). The bench page is phone-ready: tap a model, it runs 20 guesses, results stay on the page, and "Copy all results" puts them on the clipboard. It needs to be reachable over HTTPS (the Cache API only works on secure origins). Options:
 1. **Push the repo and publish `site/` to GitHub Pages now** (`biccyanzac-pixel.github.io/describle/bench/`), as Phase 4 will anyway. The bench page has no game content.
