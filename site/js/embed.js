@@ -13,7 +13,9 @@
 export const MODELS = {
   // The game's model (docs/model.md). Pinned to a commit so the vectors in site/data/ always match it.
   // file = what the browser loads; dtype = the same weights as Transformers.js names them (the offline pipeline).
-  'minilm-l6': { kind: 'onnx', repo: 'Xenova/all-MiniLM-L6-v2', revision: '751bff37182d3f1213fa05d7196b954e230abad9', file: 'onnx/model_quantized.onnx', dtype: 'q8', pooling: 'mean', dim: 384, licence: 'Apache-2.0' },
+  // mirror: the same files (checked: identical SHA-256) on this site, used when the Hub can't be reached, e.g. when
+  // Safari's tracking protection blocks the cross-site download.
+  'minilm-l6': { kind: 'onnx', repo: 'Xenova/all-MiniLM-L6-v2', revision: '751bff37182d3f1213fa05d7196b954e230abad9', file: 'onnx/model_quantized.onnx', dtype: 'q8', pooling: 'mean', dim: 384, licence: 'Apache-2.0', mirror: 'models/all-MiniLM-L6-v2/' },
   'minilm-l3': { kind: 'onnx', repo: 'Xenova/paraphrase-MiniLM-L3-v2', file: 'onnx/model_quantized.onnx', dtype: 'q8', pooling: 'mean', dim: 384, licence: 'Apache-2.0' },
   'arctic-xs': { kind: 'onnx', repo: 'Snowflake/snowflake-arctic-embed-xs', file: 'onnx/model_quantized.onnx', dtype: 'q8', pooling: 'cls', dim: 384, licence: 'Apache-2.0' },
   'potion-8m': { kind: 'static', path: 'models/potion-base-8M/', dim: 256, licence: 'MIT' },
@@ -82,14 +84,24 @@ async function loadOnnx(name, spec, onProgress) {
   const { Tokenizer } = await staged('library', () => import(new URL('tokenizers/tokenizers.min.mjs', VENDOR).href));
   const prog = progressOver(onProgress);
   const files = ['tokenizer.json', 'tokenizer_config.json', spec.file];
-  const bufs = await staged('download', () => Promise.all(files.map((f) => fetchCached(hubUrl(spec, f), prog(f)))));
+  // Hugging Face first (free, no GitHub Pages bandwidth); this site's mirror if the Hub fails or is blocked.
+  let source = 'hub';
+  const bufs = await staged('download', async () => {
+    try {
+      return await Promise.all(files.map((f) => fetchCached(hubUrl(spec, f), prog(f))));
+    } catch (e) {
+      if (!spec.mirror) throw e;
+      source = `mirror (hub failed: ${e?.message || e})`;
+      return Promise.all(files.map((f) => fetchCached(new URL(spec.mirror + f, SITE).href, prog(f))));
+    }
+  });
   const dec = new TextDecoder();
   const core = await staged('model', () => createOnnxEmbedder({
     ort, Tokenizer, spec, modelBytes: new Uint8Array(bufs[2]),
     tokenizerJson: JSON.parse(dec.decode(bufs[0])), tokenizerConfig: JSON.parse(dec.decode(bufs[1])),
   }));
   const bytes = bufs.reduce((s, b) => s + b.byteLength, 0);
-  return { name, ...core, bytes: () => bytes };
+  return { name, ...core, bytes: () => bytes, source };
 }
 
 /**

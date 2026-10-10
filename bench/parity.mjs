@@ -20,6 +20,8 @@ const browser = which === 'chrome'
   ? await chromium.launch({ executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true })
   : await webkit.launch({ headless: true });
 const page = await browser.newPage();
+// BLOCK_HUB=1: Hugging Face unreachable, so the model comes from this site's mirror (must give identical vectors).
+if (process.env.BLOCK_HUB) await page.route(/huggingface\.co|hf\.co/, (route) => route.abort('blockedbyclient'));
 // Any shared WebAssembly.Memory is refused, as a strict stand-in for iOS.
 await page.addInitScript(() => {
   const Orig = WebAssembly.Memory;

@@ -78,8 +78,23 @@ The bench was published at https://biccyanzac-pixel.github.io/describle/bench/. 
 
 The vectors were rebuilt this way and the weights re-tuned (docs/vocab.md).
 
+**Confirmed on the iPhone** (iOS 17.7, after closing Safari):
+
+| Visit | Load | Per guess | Model |
+|---|---|---|---|
+| 1, first | 6.3 s | 27 ms | downloaded from the Hub |
+| 2 | 1.4 s | 27 ms | from the Cache API, 0 Hub requests |
+| 3 | 1.3 s | 26 ms | from the Cache API, 0 Hub requests |
+
+WASM memory was 88 MB, all ordinary, with no errors.
+
 ## Hosting the model (decided)
-The owner chose the Hugging Face Hub, pinned to a commit: free, and it doesn't use GitHub Pages bandwidth. The browser fetches `https://huggingface.co/Xenova/all-MiniLM-L6-v2/resolve/751bff3…/onnx/model_quantized.onnx` (and the tokenizer files), then keeps them in the Cache API (`describle-models-v1`). Phase 4 adds a fallback to a copy on GitHub Pages, used only if the Hub fails.
+The owner chose the Hugging Face Hub, pinned to a commit: free, and it doesn't use GitHub Pages bandwidth. The browser fetches `https://huggingface.co/Xenova/all-MiniLM-L6-v2/resolve/751bff3…/onnx/model_quantized.onnx` (and the tokenizer files), then keeps them in the Cache API (`describle-models-v1`).
+
+**Fallback (added 10 Oct 2026):** `site/models/all-MiniLM-L6-v2/` holds the same three files (SHA-256 `afdb6f1a…`, identical to the Hub's). They're used automatically if any Hub download fails.
+- **Why now:** on the iPhone, Safari once offered "Reduce Protections", which it does when its tracking protection blocks something on a page. Earlier runs had also failed with "Load failed", which is exactly the error WebKit gives when the Hub is blocked.
+- **Checks:** `BLOCK_HUB=1 node bench/phone-flow.mjs webkit` (all visits load from the mirror) and `BLOCK_HUB=1 node bench/parity.mjs webkit` (identical vectors).
+- **Cost:** the mirror costs GitHub Pages bandwidth only for players whose Hub download fails.
 
 ## Reproduce
 ```

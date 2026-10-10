@@ -22,6 +22,8 @@ if (process.env.SIMULATE_IOS) {
     WebAssembly.Memory = Strict;
   });
 }
+// BLOCK_HUB=1: every request to Hugging Face fails, as when Safari's tracking protection blocks it.
+if (process.env.BLOCK_HUB) await ctx.route(/huggingface\.co|hf\.co/, (route) => route.abort('blockedbyclient'));
 const page = ctx.pages()[0] ?? await ctx.newPage();
 await page.goto(`${base}bench/`);
 await page.click('#forget');
@@ -31,7 +33,7 @@ const results = await page.evaluate(() => JSON.parse(localStorage.getItem('descr
 let failed = 0;
 for (const r of results) {
   if (r.error) { failed++; console.log(`visit ${r.visit}: FAILED while ${r.stage}: ${r.error}`); }
-  else console.log(`visit ${r.visit}: ok, load ${r.loadMs} ms, guess ${r.guessMedian} ms, memory ${r.memoryRequests}; cached before: ${r.cachedBefore}; hub: ${r.hubRequests}`);
+  else console.log(`visit ${r.visit}: ok, load ${r.loadMs} ms, guess ${r.guessMedian} ms, model from ${r.modelSource}; cached before: ${r.cachedBefore}; last guess: ${r.lastGuess}`);
 }
 await ctx.close();
 srv?.closeAllConnections(); srv?.close();
