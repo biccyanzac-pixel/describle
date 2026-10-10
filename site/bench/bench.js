@@ -1,4 +1,4 @@
-﻿// Phase 1 model bench. ?model=<name>&runtime=lean|default&rows=46500&guesses=20&auto=1
+// Phase 1 model bench. ?model=<name>&runtime=lean|default&rows=46500&guesses=20&auto=1
 // Results are kept in localStorage (so a phone can run several models and copy them all at once) and
 // exposed as window.__bench for bench/run-browser.mjs.
 
@@ -18,6 +18,7 @@ for (const fn of ['instantiate', 'instantiateStreaming']) {
 const wasmBytes = () => [...memories].reduce((s, m) => s + m.buffer.byteLength, 0);
 
 import { MODELS, loadEmbedder, createScorer, topK } from '../js/embed.js';
+import { loadVocab } from '../js/vocab.js';
 
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
@@ -50,10 +51,12 @@ async function jsHeap() {
 }
 
 async function run(name, runtime) {
-  const rows = Number(params.get('rows')) || 46500;   // ~15k words + ~31.5k definitions (bench/data/probe_vocab.json)
+  // minilm-l6 uses the game's real vocabulary (site/data, 25k rows); other models a random matrix of that size.
+  const real = name === 'minilm-l6' && params.get('real') !== '0';
+  let rows = Number(params.get('rows')) || 25024;
   const guesses = Number(params.get('guesses')) || 20;
   const clues = (await (await fetch('clues.json')).json()).clues.map((c) => c[1]);
-  $('status').textContent = `Loading ${name} (${runtime})â€¦`;
+  $('status').textContent = `Loading ${name} (${runtime})…`;
   $('bar').hidden = false;
   const t0 = performance.now();
   let downloaded = 0;
@@ -68,25 +71,37 @@ async function run(name, runtime) {
   const fromHub = entries.some((e) => /huggingface\.co|hf\.co/.test(e.name));
   const transfer = entries.reduce((s, e) => s + (e.transferSize || 0), 0) + (fromHub ? downloaded : 0);
 
-  $('status').textContent = 'First descriptionâ€¦';
+  $('status').textContent = 'First description…';
   let t = performance.now();
   await emb.embed('a warm-up sentence to compile everything');
   const firstMs = performance.now() - t;
 
-  // A vocabulary-sized int8 matrix of random unit vectors (content doesn't matter for timing).
   const dim = emb.dim;
-  const scorer = await createScorer(rows, dim, { simd: params.get('simd') !== '0' });
-  const mat = scorer.mat;
-  for (let i = 0; i < mat.length; i++) mat[i] = (Math.random() * 60 - 30) | 0;
+  let score, simd, vocabMs = 0, vocabBytes = 0;
+  if (real) {
+    $('status').textContent = 'Loading the vocabulary…';
+    const tv = performance.now();
+    const V = await loadVocab({ onProgress: ({ loaded, total }) => { vocabBytes = loaded; $('bar').max = total || 1; $('bar').value = loaded; } });
+    vocabMs = performance.now() - tv;
+    rows = V.rows; simd = true;
+    score = (q) => V.guess(q);
+  } else {
+    // A vocabulary-sized int8 matrix of random unit vectors (content doesn't matter for timing).
+    const scorer = await createScorer(rows, dim, { simd: params.get('simd') !== '0' });
+    for (let i = 0; i < scorer.mat.length; i++) scorer.mat[i] = (Math.random() * 60 - 30) | 0;
+    simd = scorer.simd;
+    score = (q) => topK(scorer.score(q), 5);
+  }
+  let lastTop = null;
 
   const embedMs = [], scoreMs = [], totalMs = [];
   for (let g = 0; g < guesses; g++) {
-    $('status').textContent = `Guess ${g + 1}/${guesses}â€¦`;
+    $('status').textContent = `Guess ${g + 1}/${guesses}…`;
     await new Promise((r) => setTimeout(r, 0)); // let the page paint, as the game would
     const t1 = performance.now();
     const q = await emb.embed(clues[g % clues.length]);
     const t2 = performance.now();
-    topK(scorer.score(q), 5);
+    lastTop = score(q);
     const t3 = performance.now();
     embedMs.push(t2 - t1); scoreMs.push(t3 - t2); totalMs.push(t3 - t1);
   }
@@ -97,7 +112,9 @@ async function run(name, runtime) {
     modelBytes: emb.bytes(), downloaded, transfer, loadMs: ms(loadMs), firstMs: ms(firstMs),
     embedMedian: +median(embedMs).toFixed(1), embedP95: +pct(embedMs, 0.95).toFixed(1),
     scoreMedian: +median(scoreMs).toFixed(1), guessMedian: +median(totalMs).toFixed(1), guessMax: +Math.max(...totalMs).toFixed(1),
-    rows, dim, simd: scorer.simd, matrixBytes: mat.byteLength, wasmBytes: wasmBytes(), heapBytes: heap.total, heapHow: heap.how, guesses,
+    rows, dim, simd, matrixBytes: rows * dim, real, vocabMs: ms(vocabMs), vocabBytes,
+    wasmBytes: wasmBytes(), heapBytes: heap.total, heapHow: heap.how, guesses,
+    lastGuess: real ? lastTop.top.map((t) => t.word).join(', ') : undefined,
   };
   result.cold = result.downloaded > 0 && result.transfer > 1e6;
   return result;

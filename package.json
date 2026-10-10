@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "describle",
   "private": true,
   "type": "module",
@@ -7,7 +7,8 @@
     "bench": "node bench/run-browser.mjs"
   },
   "dependencies": {
-    "@huggingface/transformers": "4.3.1"
+    "@huggingface/transformers": "4.3.1",
+    "stemmer": "^2.0.1"
   },
   "devDependencies": {
     "playwright-core": "1.64.0",

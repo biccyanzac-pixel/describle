@@ -5,7 +5,8 @@
 // Used by the game and by the Phase 1 bench (site/bench/).
 
 export const MODELS = {
-  'minilm-l6': { kind: 'onnx', repo: 'Xenova/all-MiniLM-L6-v2', dtype: 'q8', pooling: 'mean', dim: 384, licence: 'Apache-2.0' },
+  // The game's model (docs/model.md). Pinned to a commit so the vectors in site/data/ always match it.
+  'minilm-l6': { kind: 'onnx', repo: 'Xenova/all-MiniLM-L6-v2', revision: '751bff37182d3f1213fa05d7196b954e230abad9', dtype: 'q8', pooling: 'mean', dim: 384, licence: 'Apache-2.0' },
   'minilm-l3': { kind: 'onnx', repo: 'Xenova/paraphrase-MiniLM-L3-v2', dtype: 'q8', pooling: 'mean', dim: 384, licence: 'Apache-2.0' },
   'arctic-xs': { kind: 'onnx', repo: 'Snowflake/snowflake-arctic-embed-xs', dtype: 'q8', pooling: 'cls', dim: 384, licence: 'Apache-2.0' },
   'potion-8m': { kind: 'static', path: 'models/potion-base-8M/', dim: 256, licence: 'MIT' },
@@ -49,6 +50,7 @@ async function loadOnnx(name, spec, onProgress, runtime) {
   let bytes = 0;
   const extractor = await pipeline('feature-extraction', spec.repo, {
     dtype: spec.dtype,
+    ...(spec.revision && { revision: spec.revision }),
     device: 'wasm',
     progress_callback: (e) => {
       if (e.status === 'progress' && e.file) {
@@ -76,7 +78,7 @@ async function loadOnnx(name, spec, onProgress, runtime) {
 }
 
 /** Fetch with byte progress, through the Cache API when the browser has it (it doesn't on plain http). */
-async function fetchCached(url, onBytes) {
+export async function fetchCached(url, onBytes = () => {}) {
   let cache = null;
   try { if (typeof caches !== 'undefined') cache = await caches.open(STATIC_CACHE); } catch { /* private mode etc. */ }
   let res = cache && await cache.match(url).catch(() => null);

@@ -1,4 +1,4 @@
-﻿"""Phase 1 probe vocabulary: the ~15k most frequent English words that WordNet knows as a noun, verb or adjective,
+"""Phase 1 probe vocabulary: the ~15k most frequent English words that WordNet knows as a noun, verb or adjective,
 with up to 3 WordNet definitions each. Only used to compare models (bench/quality.mjs); Phase 2 builds the real one.
 
     .venv/Scripts/python bench/probe_vocab.py  ->  bench/data/probe_vocab.json

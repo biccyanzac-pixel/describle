@@ -1,0 +1,464 @@
+{
+ "spec": {
+  "top1": 161,
+  "top5": 177
+ },
+ "loo": {
+  "top1": 7,
+  "top5": 27
+ },
+ "n": 200,
+ "examples": [
+  {
+   "target": "archives",
+   "banned": [
+    "museum",
+    "library",
+    "registrar",
+    "annals",
+    "memorabilia"
+   ],
+   "desc": "collection of records especially about an institution",
+   "top": [
+    "register",
+    "file",
+    "archive",
+    "record",
+    "copy"
+   ]
+  },
+  {
+   "target": "minority",
+   "banned": [
+    "majority",
+    "racial",
+    "ethnicity",
+    "interracial",
+    "demographic"
+   ],
+   "desc": "a group of people who differ or politically from a larger group of which it is a part",
+   "top": [
+    "body",
+    "member",
+    "country",
+    "people",
+    "nation"
+   ]
+  },
+  {
+   "target": "con",
+   "banned": [
+    "pro",
+    "scam",
+    "convict",
+    "approve",
+    "contentious"
+   ],
+   "desc": "an argument opposed to a proposal",
+   "top": [
+    "debate",
+    "anti",
+    "suggestion",
+    "pro",
+    "advice"
+   ]
+  },
+  {
+   "target": "hunter",
+   "banned": [
+    "hunting",
+    "seeker",
+    "scout",
+    "sentinel",
+    "fowler"
+   ],
+   "desc": "someone who game",
+   "top": [
+    "player",
+    "participant",
+    "tracker",
+    "person",
+    "scorer"
+   ]
+  },
+  {
+   "target": "booth",
+   "banned": [
+    "stall",
+    "plaza",
+    "shop",
+    "mall",
+    "hall"
+   ],
+   "desc": "a table in a restaurant or bar surrounded by two high backed benches",
+   "top": [
+    "console",
+    "kitchen",
+    "table",
+    "cafe",
+    "counter"
+   ]
+  },
+  {
+   "target": "welfare",
+   "banned": [
+    "benefit",
+    "wellbeing",
+    "charity",
+    "wellness",
+    "healthy"
+   ],
+   "desc": "governmental provision of economic assistance to persons in need",
+   "top": [
+    "benefit",
+    "finance",
+    "help",
+    "pay",
+    "service"
+   ]
+  },
+  {
+   "target": "subscription",
+   "banned": [
+    "subscriber",
+    "contract",
+    "contributor",
+    "pledge",
+    "credit"
+   ],
+   "desc": "a payment for consecutive issues of a newspaper or magazine for a given period of time",
+   "top": [
+    "magazine",
+    "weekly",
+    "monthly",
+    "quarterly",
+    "daily"
+   ]
+  },
+  {
+   "target": "bone",
+   "banned": [
+    "skeletal",
+    "skeleton",
+    "marrow",
+    "ivory",
+    "skull"
+   ],
+   "desc": "rigid connective tissue that makes up the of vertebrates",
+   "top": [
+    "flesh",
+    "muscle",
+    "back",
+    "neck",
+    "marrow"
+   ]
+  },
+  {
+   "target": "father",
+   "banned": [
+    "sire",
+    "dad",
+    "daddy",
+    "grandfather",
+    "parent"
+   ],
+   "desc": "a male also used as a term of address to your",
+   "top": [
+    "sir",
+    "buster",
+    "dude",
+    "junior",
+    "man"
+   ]
+  },
+  {
+   "target": "farming",
+   "banned": [
+    "agricultural",
+    "farmland",
+    "rural",
+    "cultivated",
+    "gardening"
+   ],
+   "desc": "the practice of the land or raising stock",
+   "top": [
+    "agriculture",
+    "get",
+    "agricultural",
+    "stocking",
+    "farm"
+   ]
+  },
+  {
+   "target": "interface",
+   "banned": [
+    "interaction",
+    "system",
+    "connection",
+    "chemistry",
+    "junction"
+   ],
+   "desc": "a surface forming a common boundary between two things two objects or liquids or chemical phases",
+   "top": [
+    "edge",
+    "surface",
+    "phase",
+    "material",
+    "skin"
+   ]
+  },
+  {
+   "target": "zero",
+   "banned": [
+    "number",
+    "nothing",
+    "null",
+    "nil",
+    "insignificant"
+   ],
+   "desc": "a quantity of no importance",
+   "top": [
+    "least",
+    "nothing",
+    "nix",
+    "nil",
+    "lesser"
+   ]
+  },
+  {
+   "target": "sending",
+   "banned": [
+    "messaging",
+    "transmitting",
+    "mailing",
+    "messenger",
+    "recipient"
+   ],
+   "desc": "the act of causing something to go especially",
+   "top": [
+    "cause",
+    "causation",
+    "let",
+    "making",
+    "send"
+   ]
+  },
+  {
+   "target": "broadcasting",
+   "banned": [
+    "radio",
+    "channels",
+    "television",
+    "wireless",
+    "communications"
+   ],
+   "desc": "a medium that disseminates via telecommunications",
+   "top": [
+    "radio",
+    "wireless",
+    "communications",
+    "transmit",
+    "broadcast"
+   ]
+  },
+  {
+   "target": "motor",
+   "banned": [
+    "engine",
+    "drive",
+    "locomotive",
+    "automobile",
+    "mechanical"
+   ],
+   "desc": "machine that converts other forms of energy into energy and so imparts motion",
+   "top": [
+    "machine",
+    "engine",
+    "fuel",
+    "turbine",
+    "energetic"
+   ]
+  },
+  {
+   "target": "brand",
+   "banned": [
+    "trademark",
+    "hallmark",
+    "generic",
+    "manufacturer",
+    "product"
+   ],
+   "desc": "a name given to a or service",
+   "top": [
+    "term",
+    "call",
+    "use",
+    "useful",
+    "help"
+   ]
+  },
+  {
+   "target": "wine",
+   "banned": [
+    "winery",
+    "brandy",
+    "vintage",
+    "vineyard",
+    "champagne"
+   ],
+   "desc": "fermented juice of grapes especially",
+   "top": [
+    "must",
+    "brandy",
+    "perry",
+    "jelly",
+    "vineyard"
+   ]
+  },
+  {
+   "target": "phoenix",
+   "banned": [
+    "cactus",
+    "mango",
+    "coco",
+    "pear",
+    "erica"
+   ],
+   "desc": "a large monocotyledonous genus of pinnate leaved palms found in asia and africa",
+   "top": [
+    "ash",
+    "coco",
+    "rhino",
+    "brake",
+    "forest"
+   ]
+  },
+  {
+   "target": "availability",
+   "banned": [
+    "accessibility",
+    "convenience",
+    "usable",
+    "standby",
+    "unavailable"
+   ],
+   "desc": "the quality of being at hand when needed",
+   "top": [
+    "accessibility",
+    "good",
+    "importance",
+    "enough",
+    "utility"
+   ]
+  },
+  {
+   "target": "leg",
+   "banned": [
+    "foot",
+    "thigh",
+    "limb",
+    "knee",
+    "hip"
+   ],
+   "desc": "a human commonly used to refer to a whole but technically only the part of the between the and ankle",
+   "top": [
+    "foot",
+    "arm",
+    "pes",
+    "person",
+    "hand"
+   ]
+  },
+  {
+   "target": "guard",
+   "banned": [
+    "monitor",
+    "protector",
+    "watch",
+    "vigilant",
+    "supervise"
+   ],
+   "desc": "a person who keeps over something or someone",
+   "top": [
+    "slave",
+    "holder",
+    "person",
+    "owner",
+    "lose"
+   ]
+  },
+  {
+   "target": "honey",
+   "banned": [
+    "sweet",
+    "beloved",
+    "dearest",
+    "mead",
+    "hive"
+   ],
+   "desc": "a yellow liquid produced by bees",
+   "top": [
+    "water",
+    "nectar",
+    "gold",
+    "yellow",
+    "mead"
+   ]
+  },
+  {
+   "target": "twitter",
+   "banned": [
+    "tweet",
+    "roaring",
+    "buzz",
+    "rattle",
+    "beep"
+   ],
+   "desc": "a series of chirps",
+   "top": [
+    "tweet",
+    "cricket",
+    "smart",
+    "wow",
+    "twitter"
+   ]
+  },
+  {
+   "target": "importance",
+   "banned": [
+    "crucial",
+    "prominent",
+    "notable",
+    "greatness",
+    "monumental"
+   ],
+   "desc": "the quality of being and worthy of note",
+   "top": [
+    "good",
+    "significance",
+    "best",
+    "dignity",
+    "worthy"
+   ]
+  },
+  {
+   "target": "collection",
+   "banned": [
+    "collector",
+    "accumulation",
+    "corpus",
+    "collage",
+    "catalog"
+   ],
+   "desc": "several things grouped together or considered as a whole",
+   "top": [
+    "combination",
+    "aggregation",
+    "accumulation",
+    "group",
+    "crowd"
+   ]
+  }
+ ],
+ "emptied": 0
+}

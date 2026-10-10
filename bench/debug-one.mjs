@@ -1,5 +1,5 @@
-﻿// Debug a single bench run: prints console output and the status line every 5 s.
-//   node bench/debug-one.mjs <model> <runtime> [chrome|webkit]
+// Debug a single bench run: prints console output and the status line every 5 s.
+//   node bench/debug-one.mjs <model> <runtime> [chrome|webkit]     (BASE=https://…/describle/ to test the live site)
 import { chromium, webkit } from 'playwright-core';
 import { serve } from '../tools/serve.mjs';
 
@@ -13,7 +13,7 @@ page.on('console', (m) => console.log(`[${m.type()}] ${m.text()}`));
 page.on('pageerror', (e) => console.log(`[pageerror] ${e.message}`));
 page.on('requestfailed', (r) => console.log(`[requestfailed] ${r.url()} ${r.failure()?.errorText}`));
 page.on('response', (r) => { if (r.status() >= 400) console.log(`[http ${r.status()}] ${r.url()}`); });
-await page.goto(`http://localhost:8083/bench/?model=${model}&runtime=${runtime}&auto=1`);
+await page.goto(`${process.env.BASE || 'http://localhost:8083/'}bench/?model=${model}&runtime=${runtime}&auto=1`);
 const t0 = Date.now();
 while (Date.now() - t0 < 180000) {
   const r = await page.evaluate(() => window.__bench);

@@ -1,4 +1,4 @@
-﻿// Drives site/bench/ in real browsers: each model gets a fresh context (empty cache) -> cold run, then a
+// Drives site/bench/ in real browsers: each model gets a fresh context (empty cache) -> cold run, then a
 // reload in the same context -> warm run (model from the Cache API).
 //   node bench/run-browser.mjs [chrome|webkit ...]   -> prints a table, writes bench/results/desktop-<browsers>.json
 import fs from 'node:fs';

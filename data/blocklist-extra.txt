@@ -1,0 +1,2 @@
+# Extra words kept out of the vocabulary (on top of LDNOOBW), one per line.
+# Add any word that shows up as a guess and shouldn't.
