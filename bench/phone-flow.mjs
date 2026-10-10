@@ -31,7 +31,7 @@ const results = await page.evaluate(() => JSON.parse(localStorage.getItem('descr
 let failed = 0;
 for (const r of results) {
   if (r.error) { failed++; console.log(`visit ${r.visit}: FAILED while ${r.stage}: ${r.error}`); }
-  else console.log(`visit ${r.visit}: ok, load ${r.loadMs} ms, guess ${r.guessMedian} ms, memory ${r.memoryRequests}`);
+  else console.log(`visit ${r.visit}: ok, load ${r.loadMs} ms, guess ${r.guessMedian} ms, memory ${r.memoryRequests}; cached before: ${r.cachedBefore}; hub: ${r.hubRequests}`);
 }
 await ctx.close();
 srv?.closeAllConnections(); srv?.close();

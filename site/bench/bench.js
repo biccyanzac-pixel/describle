@@ -65,6 +65,15 @@ async function run(name, runtime) {
   const guesses = Number(params.get('guesses')) || 20;
   stage = 'clues';
   const clues = (await (await fetch('clues.json')).json()).clues.map((c) => c[1]);
+  // Was the model in the Cache API before this visit? (number of cached files per cache)
+  let cachedBefore = 'no Cache API';
+  try {
+    if (typeof caches !== 'undefined') {
+      const parts = [];
+      for (const k of await caches.keys()) parts.push(`${k}: ${(await (await caches.open(k)).keys()).length}`);
+      cachedBefore = parts.join(', ') || 'empty';
+    }
+  } catch (e) { cachedBefore = `error: ${e.message}`; }
   stage = 'loading the model';
   $('status').textContent = `Loading ${name} (${runtime})…`;
   $('bar').hidden = false;
@@ -78,7 +87,9 @@ async function run(name, runtime) {
   // Bytes the network actually delivered. Same-origin files report transferSize (0 for Cache API hits);
   // Hugging Face responses report 0 (no Timing-Allow-Origin), so count the model bytes if they were fetched at all.
   const entries = performance.getEntriesByType('resource');
-  const fromHub = entries.some((e) => /huggingface\.co|hf\.co/.test(e.name));
+  const hub = entries.filter((e) => /huggingface\.co|hf\.co|xethub|cas-bridge/.test(e.name));
+  const fromHub = hub.length > 0;
+  const hubRequests = `${hub.length} requests, ${Math.round(hub.reduce((s, e) => s + e.duration, 0))} ms`;
   const transfer = entries.reduce((s, e) => s + (e.transferSize || 0), 0) + (fromHub ? downloaded : 0);
 
   stage = 'first description';
@@ -122,7 +133,7 @@ async function run(name, runtime) {
   const result = {
     when: new Date().toISOString(), device: device(), ua: navigator.userAgent, model: name, runtime: MODELS[name].kind === 'static' ? 'static' : runtime,
     threads: 1, isolated: self.crossOriginIsolated, cores: navigator.hardwareConcurrency,
-    modelBytes: emb.bytes(), downloaded, transfer, loadMs: ms(loadMs), firstMs: ms(firstMs),
+    modelBytes: emb.bytes(), downloaded, transfer, cachedBefore, hubRequests, loadMs: ms(loadMs), firstMs: ms(firstMs),
     embedMedian: +median(embedMs).toFixed(1), embedP95: +pct(embedMs, 0.95).toFixed(1),
     scoreMedian: +median(scoreMs).toFixed(1), guessMedian: +median(totalMs).toFixed(1), guessMax: +Math.max(...totalMs).toFixed(1),
     rows, dim, simd, matrixBytes: rows * dim, real, vocabMs: ms(vocabMs), vocabBytes,
@@ -199,8 +210,9 @@ if (params.get('model') && params.get('auto')) {
   }
   $('bar').hidden = true;
   if (visit && visit < of) {
-    $('status').textContent += ' Next visit in 2 seconds…';
-    setTimeout(() => location.replace(`?model=minilm-l6&runtime=lean&auto=1&phone=${visit + 1}&of=${of}`), 2000);
+    // 10 s, not 2: an instant reload left the previous page's WASM memory still reserved on iOS (out of memory).
+    $('status').textContent += ' Next visit in 10 seconds…';
+    setTimeout(() => location.replace(`?model=minilm-l6&runtime=lean&auto=1&phone=${visit + 1}&of=${of}`), 10000);
   } else if (visit) {
     $('status').textContent += ' All done: tap "Copy all results" and paste them back.';
   }
