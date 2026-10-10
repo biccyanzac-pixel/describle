@@ -31,7 +31,28 @@ export async function loadEmbedder(name, { onProgress = () => {}, runtime = 'lea
   return spec.kind === 'static' ? loadStatic(name, spec, onProgress) : loadOnnx(name, spec, onProgress, runtime);
 }
 
+/**
+ * Every ONNX Runtime Web build declares shared WASM memory with a 4 GB maximum. A shared memory can't move, so
+ * the browser reserves the whole maximum up front: fine on desktop, but iOS Safari refuses with
+ * "RangeError: Out of memory" ("no available backend found"). WebAssembly lets the page supply a memory with a
+ * *smaller* maximum than the module declares, so cap shared memories before ORT creates one.
+ * MiniLM-L6 uses ~80 MB of it; 512 MB leaves 6x headroom.
+ */
+export const ORT_MAX_MEMORY_PAGES = 8192; // x 64 KB = 512 MB
+export function capSharedWasmMemory(maxPages = ORT_MAX_MEMORY_PAGES) {
+  const Orig = WebAssembly.Memory;
+  if (Orig.capped) return;
+  function Capped(desc) {
+    if (desc?.shared && (desc.maximum ?? Infinity) > maxPages) desc = { ...desc, maximum: Math.max(maxPages, desc.initial ?? 0) };
+    return new Orig(desc);
+  }
+  Capped.prototype = Orig.prototype; // keeps `instanceof WebAssembly.Memory` working
+  Capped.capped = true;
+  WebAssembly.Memory = Capped;
+}
+
 async function loadOnnx(name, spec, onProgress, runtime) {
+  capSharedWasmMemory();
   // 'lean' needs the page's import map: onnxruntime-web/webgpu and onnxruntime-common -> vendor/ort/ort.wasm.min.mjs
   const tf = runtime === 'lean'
     ? await import(`${TJS}transformers.web.min.js`)

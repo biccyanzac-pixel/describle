@@ -4,8 +4,15 @@
 
 // --- WASM memory: track every Memory the page creates or instantiates, so we can read its size on any browser.
 const memories = new Set();
+const memoryRequests = []; // what each new WebAssembly.Memory asked for (shows the 512 MB cap is applied)
 const OrigMemory = WebAssembly.Memory;
-WebAssembly.Memory = new Proxy(OrigMemory, { construct(T, args) { const m = new T(...args); memories.add(m); return m; } });
+WebAssembly.Memory = new Proxy(OrigMemory, {
+  construct(T, args) {
+    const d = args[0] ?? {};
+    if (d.initial) memoryRequests.push(`${d.shared ? 'shared ' : ''}max ${d.maximum === undefined ? 'none' : `${Math.round(d.maximum / 16)} MB`}`);
+    const m = new T(...args); memories.add(m); return m;
+  },
+});
 const grab = (r) => {
   const inst = r?.instance ?? r;
   for (const v of Object.values(inst?.exports ?? {})) if (v instanceof OrigMemory) memories.add(v);
@@ -113,7 +120,7 @@ async function run(name, runtime) {
     embedMedian: +median(embedMs).toFixed(1), embedP95: +pct(embedMs, 0.95).toFixed(1),
     scoreMedian: +median(scoreMs).toFixed(1), guessMedian: +median(totalMs).toFixed(1), guessMax: +Math.max(...totalMs).toFixed(1),
     rows, dim, simd, matrixBytes: rows * dim, real, vocabMs: ms(vocabMs), vocabBytes,
-    wasmBytes: wasmBytes(), heapBytes: heap.total, heapHow: heap.how, guesses,
+    wasmBytes: wasmBytes(), memoryRequests: memoryRequests.join('; '), heapBytes: heap.total, heapHow: heap.how, guesses,
     lastGuess: real ? lastTop.top.map((t) => t.word).join(', ') : undefined,
   };
   result.cold = result.downloaded > 0 && result.transfer > 1e6;
@@ -125,10 +132,12 @@ function render() {
   const cols = [['device', (r) => r.device], ['model', (r) => r.model], ['runtime', (r) => r.runtime], ['cold?', (r) => r.cold ? 'cold' : 'warm'],
     ['net MB', (r) => MB(r.transfer)], ['model MB', (r) => MB(r.modelBytes)], ['load ms', (r) => r.loadMs], ['1st ms', (r) => r.firstMs],
     ['embed ms', (r) => r.embedMedian], ['score ms', (r) => r.scoreMedian], ['simd', (r) => r.simd === false ? 'no' : 'yes'], ['guess ms', (r) => r.guessMedian], ['max', (r) => r.guessMax],
-    ['WASM MB', (r) => MB(r.wasmBytes)], ['heap MB', (r) => r.heapBytes == null ? 'â€“' : MB(r.heapBytes)]];
-  $('table').innerHTML = res.length
-    ? `<tr>${cols.map((c) => `<th>${c[0]}</th>`).join('')}</tr>` + res.map((r) => `<tr>${cols.map((c) => `<td>${c[1](r)}</td>`).join('')}</tr>`).join('')
-    : '';
+    ['WASM MB', (r) => MB(r.wasmBytes)], ['heap MB', (r) => r.heapBytes == null ? '–' : MB(r.heapBytes)]];
+  const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
+  const row = (r) => r.error
+    ? `<tr><td>${esc(r.device)}</td><td>${esc(r.model)}</td><td colspan="${cols.length - 2}" style="text-align:left">failed: ${esc(r.error)}</td></tr>`
+    : `<tr>${cols.map((c) => `<td>${c[1](r)}</td>`).join('')}</tr>`;
+  $('table').innerHTML = res.length ? `<tr>${cols.map((c) => `<th>${c[0]}</th>`).join('')}</tr>` + res.map(row).join('') : '';
 }
 
 function links() {
@@ -168,7 +177,12 @@ if (params.get('model') && params.get('auto')) {
     window.__bench = r;
   } catch (e) {
     $('status').textContent = `Failed: ${e.message}`;
-    window.__bench = { error: String(e?.stack || e) };
+    // Saved too, so "Copy all results" reports failures (with what memory was asked for).
+    const fail = { when: new Date().toISOString(), device: device(), ua: navigator.userAgent, model: params.get('model'),
+      error: String(e?.message || e), memoryRequests: memoryRequests.join('; '), wasmBytes: wasmBytes() };
+    saveResults([...loadResults(), fail]);
+    render();
+    window.__bench = { ...fail, error: String(e?.stack || e) };
   }
   $('bar').hidden = true;
 }
