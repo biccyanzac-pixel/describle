@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+.pytest_cache/
+node_modules/
+.wrangler/
+worker/node_modules/
+.env
+# downloaded model files and raw data (re-fetchable)
+models/
+data/raw/
+data/cache/
+bench/results/*.png
+tools/results/
+# Phase 1 regenerable bench data (bench/probe_vocab.py, bench/quality.mjs)
+bench/data/
+bench/results/*.log
+bench/results/*.err
