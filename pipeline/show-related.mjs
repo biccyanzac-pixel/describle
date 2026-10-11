@@ -3,7 +3,7 @@
 import { loadBanData } from './ban-words.mjs';
 import { isVariant } from '../site/js/ban.js';
 
-const data = loadBanData();
+const data = await loadBanData();
 const pool = data.vocab.slice(0, 15000).map((e) => e.w);
 for (const w of process.argv.slice(2)) {
   const cands = pool.filter((v) => v !== w && v.length > w.length && (v.startsWith(w) || v.endsWith(w)) && !isVariant(v, w, data.irregular))

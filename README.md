@@ -2,21 +2,25 @@
 
 A daily word game: describe the secret word without using it (or 5 banned words), and a small language model in your browser tries to guess it. Fewer words and fewer attempts score more. Everyone gets the same word each UTC day.
 
-**Status:** Phase 2 (vocabulary, vectors, ban check) done, waiting for the owner's review. See `docs/vocab.md` (Phase 2) and `docs/model.md` (Phase 1).
-Bench (runs on a phone): https://biccyanzac-pixel.github.io/describle/bench/
+**Status:** Phase 3 (daily schedule + validation) done, waiting for the owner's review. Phase 4 (the game page, scoring, share, leaderboard) is next. **Start with `docs/status.md`.**
+Model bench (also runs on a phone): https://biccyanzac-pixel.github.io/describle/bench/
 
 ## Layout
 ```
-site/        the static game (GitHub Pages, gh-pages branch = site/). site/bench/ = the model bench
-site/js/     embed.js (text -> vector), vocab.js (load + score the vocabulary), guess.js (the guess rule),
-             ban.js (the ban check), score.wasm.js (SIMD scoring, generated)
-site/data/   vocab-v1.json + vectors-v1.bin (built by pipeline/build.mjs; never change a live version)
-site/vendor/ ONNX Runtime Web (WASM-only build), @huggingface/tokenizers, stemmer
-pipeline/    vocab.py -> embed.mjs -> tune.mjs -> build.mjs; ban-words.mjs (banned words), reference-test.mjs
-data/        vocabulary (vocab.json), clue sets for tuning/testing, blocklists, tuning results
-bench/       Phase 1 model comparison
-tools/       serve.mjs (local server, port 8082), score.wat + build-wasm.mjs
-worker/      (Phase 4) leaderboard: Cloudflare Worker + D1, like the other jacob.gg games
+site/          the static game (GitHub Pages, gh-pages branch = site/). site/bench/ = the model bench
+site/js/       embed.js (text -> vector: ORT Web 1.18 + tokenizer), vocab.js (load + score the vocabulary),
+               guess.js (the guess rule), ban.js (the ban check), daily.js (date -> puzzle, weekday curve),
+               score.wasm.js (SIMD scoring, generated)
+site/data/     vocab-v1.json + vectors-v1.bin (the vocabulary), schedule-v1.json (a word for every day)
+site/models/   a copy of the pinned model, used if the Hugging Face Hub fails
+site/vendor/   ONNX Runtime Web 1.18 (single-threaded), @huggingface/tokenizers, stemmer
+pipeline/      vocab.py, pos.py -> embed.mjs -> tune.mjs -> build.mjs -> targets.mjs -> validate.mjs -> schedule.mjs
+               (+ check-schedule-words.py safety gate, ban-words.mjs, browser-embed.mjs, reference-test.mjs)
+data/          vocabulary, clue sets, blocklists, curation lists (target-exclude.txt, checked-ok.txt), results
+bench/         model comparison, iPhone flow and parity checks
+tools/         serve.mjs (local server, port 8082), score.wat + build-wasm.mjs
+docs/          status.md (start here), model.md, vocab.md, schedule.md
+worker/        (Phase 4) leaderboard: Cloudflare Worker + D1, like the other jacob.gg games
 ```
 
 ## Develop
@@ -24,11 +28,11 @@ worker/      (Phase 4) leaderboard: Cloudflare Worker + D1, like the other jacob
 npm install
 python -m venv .venv && .venv/Scripts/pip install nltk wordfreq numpy safetensors huggingface_hub pytest
 # then, from a .py file (PowerShell 5.1 mangles inline quotes): nltk.download('wordnet'); nltk.download('stopwords')
-npm test                                    # JS: ban check, guess rule, shipped files (loads the model, ~1 min)
+npm test                                    # JS: 37 tests (~1 min; one runs headless Chrome)
 .venv/Scripts/python -m pytest              # Python: vocabulary filters
 node tools/serve.mjs                        # http://localhost:8082/bench/
 ```
-Rebuilding the vocabulary: see `docs/vocab.md`.
+Rebuilding the data and maintaining the schedule: `docs/status.md`, `docs/schedule.md`.
 
 ## Deploy
 Site: `git subtree split --prefix site -b gh-pages && git push -f origin gh-pages`.
@@ -38,5 +42,6 @@ Site: `git subtree split --prefix site -b gh-pages && git push -f origin gh-page
 - **LDNOOBW blocklist** (CC BY 4.0).
 - **wordfreq** data (CC BY-SA 4.0). `site/data/vocab-v*.json` derives from it and is CC BY-SA 4.0.
 - **all-MiniLM-L6-v2** (Apache-2.0).
-- **Transformers.js** (Apache-2.0), **ONNX Runtime Web** (MIT), **@huggingface/tokenizers** (Apache-2.0), **stemmer** (MIT).
+- **ONNX Runtime Web** (MIT), **@huggingface/tokenizers** (Apache-2.0), **stemmer** (MIT). Transformers.js (Apache-2.0) is used offline only.
+- The Brown corpus (via NLTK) is used offline only, to filter candidate words; nothing from it ships.
 - Game code: no licence chosen yet.

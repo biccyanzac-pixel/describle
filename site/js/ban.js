@@ -171,8 +171,9 @@ export function makeBanCheck({ banned, related = {}, lexicon = new Set(), irregu
 export function relatedContaining(w, vocabWords, similarity, { minSim = 0.5, irregular = {} } = {}) {
   const out = [];
   for (const v of vocabWords) {
-    if (v === w || v.length <= w.length || isVariant(v, w, irregular)) continue;
+    if (v === w || v.length <= w.length) continue;
     if (!(v.startsWith(w) || v.endsWith(w) || (w.endsWith('e') && v.startsWith(w.slice(0, -1))))) continue;
+    if (isVariant(v, w, irregular)) continue; // after the cheap test: stemming every word is slow
     if (similarity(v, w) >= minSim) out.push(v);
   }
   return out;

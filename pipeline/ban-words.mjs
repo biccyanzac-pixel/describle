@@ -6,6 +6,7 @@
 // (zipf < MIN_ZIPF), because a ban on a word nobody would use protects nothing.
 import fs from 'node:fs';
 import { isVariant, relatedContaining } from '../site/js/ban.js';
+import { createScorer } from '../site/js/embed.js';
 
 export const MIN_ZIPF = 3.3;
 // Compounds at least this close (word-vector cosine) count as using the word: kingdom 0.74, sunlight 0.85,
@@ -13,7 +14,7 @@ export const MIN_ZIPF = 3.3;
 // heart/art 0.44, hear/ear 0.47, season/son 0.34 stay allowed either way. See pipeline/show-related.mjs.
 export const RELATED_MIN_SIM = 0.55;
 
-export function loadBanData() {
+export async function loadBanData() {
   const vocab = JSON.parse(fs.readFileSync('data/vocab.json', 'utf8'));
   const irregular = JSON.parse(fs.readFileSync('data/irregular.json', 'utf8'));
   const rows = JSON.parse(fs.readFileSync('data/cache/rows.json', 'utf8'));
@@ -36,21 +37,29 @@ export function loadBanData() {
   }
   const index = new Map(vocab.map((e, i) => [e.w, i]));
   const dot = (m, a, b) => { let s = 0; for (let j = 0; j < D; j++) s += m[a * D + j] * m[b * D + j]; return s; };
+  // All profiles against one, fast: the game's SIMD scorer over int8 profiles (thousands of targets in Phase 3).
+  const scorer = await createScorer(W, D);
+  for (let i = 0; i < profiles.length; i++) scorer.mat[i] = Math.max(-127, Math.min(127, Math.round(profiles[i] * 127)));
   return {
     vocab, irregular, index, W,
     profileSim: (a, b) => dot(profiles, index.get(a), index.get(b)),
+    profileScores: (w) => scorer.score(profiles.subarray(index.get(w) * D, (index.get(w) + 1) * D)),
     wordSim: (a, b) => dot(words, index.get(a), index.get(b)) / (127 * 127),
   };
 }
 
-/** The 5 banned words for `target` (best first). `n` limits candidates to the game's vocabulary size. */
-export function bannedFor(target, data, { n = data.W, count = 5 } = {}) {
-  const { vocab, irregular, profileSim } = data;
+/**
+ * The 5 banned words for `target` (best first). `n` limits candidates to the game's vocabulary size; `skip` is a
+ * Set of words never to show as banned words (data/target-exclude.txt: e.g. "sperm" for egg, "bra" for teddy).
+ */
+export function bannedFor(target, data, { n = data.W, count = 5, skip = new Set() } = {}) {
+  const { vocab, irregular } = data;
+  const sims = data.profileScores(target);
   const scored = [];
   for (let i = 0; i < n; i++) {
     const w = vocab[i].w;
-    if (w === target || vocab[i].zipf < MIN_ZIPF) continue;
-    scored.push([profileSim(target, w), w]);
+    if (w === target || vocab[i].zipf < MIN_ZIPF || skip.has(w)) continue;
+    scored.push([sims[i], w]);
   }
   scored.sort((a, b) => b[0] - a[0]);
   const out = [];
@@ -64,6 +73,11 @@ export function bannedFor(target, data, { n = data.W, count = 5 } = {}) {
 
 /** { word: [vocabulary compounds that count as using it] } for the target and its banned words. */
 export function relatedFor(wordsList, data, { n = data.W } = {}) {
-  const pool = data.vocab.slice(0, n).map((e) => e.w);
-  return Object.fromEntries(wordsList.map((w) => [w, relatedContaining(w, pool, data.wordSim, { minSim: RELATED_MIN_SIM, irregular: data.irregular })]));
+  const pool = (data.pools ??= new Map()).get(n) ?? data.pools.set(n, data.vocab.slice(0, n).map((e) => e.w)).get(n);
+  const memo = (data.related ??= new Map());
+  return Object.fromEntries(wordsList.map((w) => {
+    const key = `${n}:${w}`;
+    if (!memo.has(key)) memo.set(key, relatedContaining(w, pool, data.wordSim, { minSim: RELATED_MIN_SIM, irregular: data.irregular }));
+    return [w, memo.get(key)];
+  }));
 }

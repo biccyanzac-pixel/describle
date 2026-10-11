@@ -1,0 +1,32 @@
+# Words flagged by pipeline/check-schedule-words.py that were checked and are fine to show (as a target or a
+# banned word). One per line; the reason after #. Anything not fine goes in data/target-exclude.txt instead.
+
+# "of either sex" in an ordinary definition
+cattle   # domesticated bovine animals ... regardless of sex
+cows     # same
+child    # a young person of either sex
+male     # the sex that produces gametes (banned for "egg")
+white    # shown as a colour (banned for "color"); its first WordNet sense is the racial one
+boy      # a young male (rare slur sense)
+kidney   # an organ ("excretory")
+felony   # a serious crime (banned for "crime")
+tomb     # banned for "monument"
+
+# innocent main sense; WordNet also lists a rare slang sense
+queen    # a female monarch (rare slur sense)
+tool     # an implement (rare obscene sense)
+shaft    # a long rod (rare obscene sense)
+bull     # male bovine (rare "nonsense" sense)
+suit     # clothing (slang "businessman" sense labelled disparaging)
+dirt     # soil (rare obscene sense)
+
+# natural for its day, not offensive to show
+drug         # banned for "medication"
+affair       # banned for "romance"
+intimacy     # banned for "romance"
+vampire      # banned for "zombie" (folklore)
+graphic      # banned for "picture"
+racket       # banned for "noise"
+viewing      # banned for "screen"
+diaper       # banned for "rug"
+illicit      # banned for "unconstitutional"

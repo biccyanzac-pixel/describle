@@ -14,7 +14,7 @@ const COUNT = Number(process.argv[2]) || 200, SEED = Number(process.argv[3]) || 
 const meta = JSON.parse(fs.readFileSync(`site/data/vocab-v${VOCAB_VERSION}.json`, 'utf8'));
 const V = await makeVocab(meta, new Int8Array(fs.readFileSync(`site/data/vectors-v${VOCAB_VERSION}.bin`).buffer.slice(0)));
 const full = JSON.parse(fs.readFileSync('data/vocab.json', 'utf8'));
-const data = loadBanData();
+const data = await loadBanData();
 const E = await nodeEmbedder();
 
 // Candidate targets: common nouns (as the schedule will use), drawn with a fixed seed.

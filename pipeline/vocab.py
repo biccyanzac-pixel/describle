@@ -69,6 +69,9 @@ def sense_record(s, w):
         "lex": s.lexname(),
         # How often this sense of w was tagged in WordNet's SemCor corpus (0 for most rare senses).
         "count": sum(l.count() for l in s.lemmas() if l.name() == w),
+        # How deep in WordNet's hierarchy: small = generic (thing, system, world), large = specific (dog, kettle).
+        "depth": s.min_depth(),
+        "synset": s.name(),
         "def": s.definition(),
         "syn": [l.name().replace("_", " ") for l in s.lemmas() if l.name() != w][:4],
         "hyper": [h.lemmas()[0].name().replace("_", " ") for h in hypers][:2],

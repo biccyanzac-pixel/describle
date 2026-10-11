@@ -1,0 +1,285 @@
+{
+ "epoch": "2026-10-12",
+ "days": [
+  {
+   "word": "cat",
+   "banned": [
+    "kitten",
+    "dog",
+    "pig",
+    "tiger",
+    "wolf"
+   ]
+  },
+  {
+   "word": "bulb",
+   "banned": [
+    "lamp",
+    "fluorescent",
+    "tube",
+    "flashlight",
+    "onion"
+   ]
+  },
+  {
+   "word": "journalism",
+   "banned": [
+    "journalist",
+    "newspaper",
+    "reporting",
+    "news",
+    "columnist"
+   ]
+  },
+  {
+   "word": "cargo",
+   "banned": [
+    "hauling",
+    "freight",
+    "shipment",
+    "trucking",
+    "payload"
+   ]
+  },
+  {
+   "word": "analogy",
+   "banned": [
+    "compare",
+    "comparison",
+    "similarity",
+    "resemblance",
+    "metaphor"
+   ]
+  },
+  {
+   "word": "greed",
+   "banned": [
+    "greedy",
+    "wealth",
+    "luxury",
+    "rich",
+    "wealthy"
+   ]
+  },
+  {
+   "word": "earn",
+   "banned": [
+    "income",
+    "paid",
+    "realise",
+    "paying",
+    "profit"
+   ]
+  },
+  {
+   "word": "cricket",
+   "banned": [
+    "innings",
+    "bowling",
+    "baseball",
+    "batsman",
+    "fielding"
+   ]
+  },
+  {
+   "word": "hip",
+   "banned": [
+    "thigh",
+    "knee",
+    "waist",
+    "back",
+    "leg"
+   ]
+  },
+  {
+   "word": "knot",
+   "banned": [
+    "tie",
+    "belt",
+    "lace",
+    "stitch",
+    "web"
+   ]
+  },
+  {
+   "word": "zinc",
+   "banned": [
+    "magnesium",
+    "cobalt",
+    "metal",
+    "titanium",
+    "silver"
+   ]
+  },
+  {
+   "word": "award",
+   "banned": [
+    "honour",
+    "honor",
+    "medal",
+    "trophy",
+    "prize"
+   ]
+  },
+  {
+   "word": "volleyball",
+   "banned": [
+    "basketball",
+    "softball",
+    "football",
+    "baseball",
+    "tennis"
+   ]
+  },
+  {
+   "word": "download",
+   "banned": [
+    "upload",
+    "online",
+    "software",
+    "podcast",
+    "website"
+   ]
+  },
+  {
+   "word": "curry",
+   "banned": [
+    "cuisine",
+    "cook",
+    "spice",
+    "dressing",
+    "dessert"
+   ]
+  },
+  {
+   "word": "polymer",
+   "banned": [
+    "nylon",
+    "synthetic",
+    "molecule",
+    "resin",
+    "plastic"
+   ]
+  },
+  {
+   "word": "keeper",
+   "banned": [
+    "caretaker",
+    "steward",
+    "handler",
+    "manager",
+    "chamberlain"
+   ]
+  },
+  {
+   "word": "bracelet",
+   "banned": [
+    "jewellery",
+    "jewelry",
+    "necklace",
+    "wrist",
+    "pendant"
+   ]
+  },
+  {
+   "word": "opinion",
+   "banned": [
+    "persuasion",
+    "belief",
+    "sentiment",
+    "speculate",
+    "conjecture"
+   ]
+  },
+  {
+   "word": "exodus",
+   "banned": [
+    "refugee",
+    "trek",
+    "odyssey",
+    "jungle",
+    "covenant"
+   ]
+  },
+  {
+   "word": "practical",
+   "banned": [
+    "virtual",
+    "technique",
+    "practised",
+    "usefulness",
+    "challenging"
+   ]
+  },
+  {
+   "word": "concrete",
+   "banned": [
+    "cement",
+    "stone",
+    "sandstone",
+    "gravel",
+    "mortar"
+   ]
+  },
+  {
+   "word": "livestock",
+   "banned": [
+    "cattle",
+    "cows",
+    "pasture",
+    "farm",
+    "barn"
+   ]
+  },
+  {
+   "word": "presidency",
+   "banned": [
+    "presidential",
+    "chairman",
+    "elected",
+    "administrative",
+    "chair"
+   ]
+  },
+  {
+   "word": "rainfall",
+   "banned": [
+    "rain",
+    "rainy",
+    "precipitation",
+    "moisture",
+    "humidity"
+   ]
+  },
+  {
+   "word": "security",
+   "banned": [
+    "protection",
+    "safety",
+    "safe",
+    "insecurity",
+    "unsafe"
+   ]
+  },
+  {
+   "word": "talent",
+   "banned": [
+    "gifted",
+    "skill",
+    "ability",
+    "adept",
+    "genius"
+   ]
+  },
+  {
+   "word": "aware",
+   "banned": [
+    "mindful",
+    "realize",
+    "consciousness",
+    "know",
+    "conscious"
+   ]
+  }
+ ]
+}
