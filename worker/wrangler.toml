@@ -1,0 +1,12 @@
+name = "describle-leaderboard"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "describle-leaderboard"
+database_id = "7df914a0-5150-4a5a-a57f-7c541b34ebde"
+
+# Browser origins allowed to call this API (comma-separated).
+[vars]
+ALLOWED_ORIGINS = "https://biccyanzac-pixel.github.io"

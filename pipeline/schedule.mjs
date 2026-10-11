@@ -27,7 +27,10 @@ const exclude = new Set(fs.readFileSync('data/target-exclude.txt', 'utf8').split
 
 // Difficulty within a tier, 0 (easiest) .. 1: half word frequency (common = easy), half the validation margin
 // (how far the model's guess beat the runner-up from the reference description: wide = easy).
-const eligible = targets.filter((t) => validation[t.w]?.pass && !exclude.has(t.w)).map((t) => ({ ...t, ...validation[t.w] }));
+// Playtests (pipeline/playtest.mjs): a word whose natural descriptions all missed the AI's top 3 is out.
+const playtest = fs.existsSync('data/playtest-results.json') ? JSON.parse(fs.readFileSync('data/playtest-results.json', 'utf8')) : {};
+const eligible = targets.filter((t) => validation[t.w]?.pass && !exclude.has(t.w) && playtest[t.w]?.pass !== false)
+  .map((t) => ({ ...t, ...validation[t.w] }));
 const pct = (list, key) => { const s = [...list].sort((a, b) => b[key] - a[key]); return new Map(s.map((t, i) => [t.w, i / Math.max(1, s.length - 1)])); };
 const tiers = {};
 for (const t of eligible) (tiers[t.tier] ??= []).push(t);

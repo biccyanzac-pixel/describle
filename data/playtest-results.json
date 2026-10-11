@@ -1,0 +1,1670 @@
+{
+ "earn": {
+  "ranks": [
+   31,
+   2
+  ],
+  "tops": [
+   "pay, repay, finance, refund, repayment",
+   "merit, earn, service, garner, interest"
+  ],
+  "best": 2,
+  "pass": true
+ },
+ "download": {
+  "ranks": [
+   1
+  ],
+  "tops": [
+   "download, upload, reproduce, online, podcast"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "practical": {
+  "ranks": [
+   360
+  ],
+  "tops": [
+   "drop, know, action, work, way"
+  ],
+  "best": 360,
+  "pass": false
+ },
+ "aware": {
+  "ranks": [
+   592,
+   1018
+  ],
+  "tops": [
+   "look, guard, sign, watch, sudden",
+   "knowledgeable, warning, warn, consciousness, report"
+  ],
+  "best": 592,
+  "pass": false
+ },
+ "consult": {
+  "ranks": [
+   1,
+   2129
+  ],
+  "tops": [
+   "consultant, consult, consultancy, advisor, adviser",
+   "years, likely, patient, medical, dressed"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "fail": {
+  "ranks": [
+   19,
+   2
+  ],
+  "tops": [
+   "failure, winning, lose, success, impossible",
+   "consider, fail, err, false, test"
+  ],
+  "best": 2,
+  "pass": true
+ },
+ "prove": {
+  "ranks": [
+   11,
+   77
+  ],
+  "tops": [
+   "argument, claim, show, believe, verify",
+   "truth, argument, statement, research, proof"
+  ],
+  "best": 11,
+  "pass": false
+ },
+ "compete": {
+  "ranks": [
+   3,
+   27
+  ],
+  "tops": [
+   "game, win, compete, side, vie",
+   "play, game, lose, bye, playoff"
+  ],
+  "best": 3,
+  "pass": true
+ },
+ "cat": {
+  "ranks": [
+   1,
+   40
+  ],
+  "tops": [
+   "cat, kitten, lion, hedgehog, beaver",
+   "rat, rabbit, hedgehog, squirrel, hamster"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "cricket": {
+  "ranks": [
+   21,
+   1
+  ],
+  "tops": [
+   "innings, stroke, baseball, game, cricketer",
+   "cricket, tweet, twitter, grasshopper, flea"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "curry": {
+  "ranks": [
+   2
+  ],
+  "tops": [
+   "salsa, curry, ketchup, sushi, benny"
+  ],
+  "best": 2,
+  "pass": true
+ },
+ "concrete": {
+  "ranks": [
+   1
+  ],
+  "tops": [
+   "concrete, earth, cement, paving, asphalt"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "bowl": {
+  "ranks": [
+   3
+  ],
+  "tops": [
+   "box, capsule, bowl, cup, dish"
+  ],
+  "best": 3,
+  "pass": true
+ },
+ "shoulder": {
+  "ranks": [
+   31
+  ],
+  "tops": [
+   "backpack, pocket, take, suitcase, person"
+  ],
+  "best": 31,
+  "pass": false
+ },
+ "salt": {
+  "ranks": [
+   9
+  ],
+  "tops": [
+   "bit, pale, crisp, done, rice"
+  ],
+  "best": 9,
+  "pass": false
+ },
+ "boat": {
+  "ranks": [
+   1
+  ],
+  "tops": [
+   "boat, ship, bucket, jar, tank"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "bulb": {
+  "ranks": [
+   234
+  ],
+  "tops": [
+   "flower, garden, bloom, overgrown, thrive"
+  ],
+  "best": 234,
+  "pass": false
+ },
+ "hip": {
+  "ranks": [
+   2,
+   32
+  ],
+  "tops": [
+   "foot, hip, thigh, waist, back",
+   "belt, seated, foot, way, stomp"
+  ],
+  "best": 2,
+  "pass": true
+ },
+ "polymer": {
+  "ranks": [
+   6,
+   2
+  ],
+  "tops": [
+   "group, build, radical, molecular, mixture",
+   "build, polymer, particle, cured, material"
+  ],
+  "best": 2,
+  "pass": true
+ },
+ "livestock": {
+  "ranks": [
+   2,
+   6
+  ],
+  "tops": [
+   "barn, livestock, feed, pork, lamb",
+   "beef, feed, cattle, barn, farming"
+  ],
+  "best": 2,
+  "pass": true
+ },
+ "peanut": {
+  "ranks": [
+   9,
+   30
+  ],
+  "tops": [
+   "nutshell, coconut, brazil, walnut, meat",
+   "milk, vegetarian, meat, brazil, slaughter"
+  ],
+  "best": 9,
+  "pass": false
+ },
+ "laptop": {
+  "ranks": [
+   3,
+   2
+  ],
+  "tops": [
+   "suitcase, notebook, laptop, cell, backpack",
+   "notebook, laptop, bed, convertible, computer"
+  ],
+  "best": 2,
+  "pass": true
+ },
+ "altar": {
+  "ranks": [
+   5
+  ],
+  "tops": [
+   "holy, sanctuary, chapel, church, altar"
+  ],
+  "best": 5,
+  "pass": false
+ },
+ "organ": {
+  "ranks": [
+   263
+  ],
+  "tops": [
+   "head, muscle, shoulder, behind, torso"
+  ],
+  "best": 263,
+  "pass": false
+ },
+ "journalism": {
+  "ranks": [
+   6,
+   4
+  ],
+  "tops": [
+   "journalist, author, writer, contributor, editor",
+   "account, news, history, journalism, journalist"
+  ],
+  "best": 4,
+  "pass": false
+ },
+ "knot": {
+  "ranks": [
+   3,
+   4281
+  ],
+  "tops": [
+   "tie, kink, knot, wrench, bow",
+   "sailing, maritime, nautical, coast, navy"
+  ],
+  "best": 3,
+  "pass": true
+ },
+ "keeper": {
+  "ranks": [
+   476,
+   762
+  ],
+  "tops": [
+   "guard, friend, spectator, think, search",
+   "goalkeeper, touchdown, offence, striker, loose"
+  ],
+  "best": 476,
+  "pass": false
+ },
+ "presidency": {
+  "ranks": [
+   29,
+   37
+  ],
+  "tops": [
+   "governor, condition, secretary, cabinet, predecessor",
+   "president, government, kingdom, authorities, statesman"
+  ],
+  "best": 29,
+  "pass": false
+ },
+ "hospitality": {
+  "ranks": [
+   4,
+   6
+  ],
+  "tops": [
+   "visiting, offer, house, hospitality, public",
+   "feed, family, kitchen, restaurant, house"
+  ],
+  "best": 4,
+  "pass": false
+ },
+ "theorem": {
+  "ranks": [
+   12,
+   1904
+  ],
+  "tops": [
+   "equation, verified, formula, half, truth",
+   "far, geometric, square, cos, sec"
+  ],
+  "best": 12,
+  "pass": false
+ },
+ "disturbance": {
+  "ranks": [
+   813
+  ],
+  "tops": [
+   "silence, calm, lull, hush, continued"
+  ],
+  "best": 813,
+  "pass": false
+ },
+ "guard": {
+  "ranks": [
+   76
+  ],
+  "tops": [
+   "screw, guardian, saved, defender, shelter"
+  ],
+  "best": 76,
+  "pass": false
+ },
+ "cargo": {
+  "ranks": [
+   3
+  ],
+  "tops": [
+   "shipment, freight, cargo, consignment, payload"
+  ],
+  "best": 3,
+  "pass": true
+ },
+ "zinc": {
+  "ranks": [
+   1,
+   91
+  ],
+  "tops": [
+   "zinc, tungsten, platinum, iron, nickel",
+   "uranium, water, mercury, iodine, particle"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "bracelet": {
+  "ranks": [
+   13,
+   1
+  ],
+  "tops": [
+   "collar, finger, shoulder, headband, glove",
+   "bracelet, belt, collar, headband, shirt"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "rainfall": {
+  "ranks": [
+   2
+  ],
+  "tops": [
+   "rain, rainfall, snow, fog, snowfall"
+  ],
+  "best": 2,
+  "pass": true
+ },
+ "tin": {
+  "ranks": [
+   1,
+   371
+  ],
+  "tops": [
+   "tin, nickel, metal, silver, painted",
+   "coffee, eat, feed, java, broth"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "driveway": {
+  "ranks": [
+   46
+  ],
+  "tops": [
+   "forward, drive, home, backyard, place"
+  ],
+  "best": 46,
+  "pass": false
+ },
+ "hut": {
+  "ranks": [
+   2
+  ],
+  "tops": [
+   "tent, hut, shack, hutch, forest"
+  ],
+  "best": 2,
+  "pass": true
+ },
+ "jelly": {
+  "ranks": [
+   41,
+   42
+  ],
+  "tops": [
+   "candy, banana, duff, sugar, seed",
+   "seed, jam, apple, strawberry, eat"
+  ],
+  "best": 41,
+  "pass": false
+ },
+ "analogy": {
+  "ranks": [
+   276,
+   185
+  ],
+  "tops": [
+   "definition, description, copy, term, evidence",
+   "concept, formulation, thought, conception, suggestion"
+  ],
+  "best": 185,
+  "pass": false
+ },
+ "award": {
+  "ranks": [
+   12,
+   21
+  ],
+  "tops": [
+   "honor, masterpiece, thanks, accepted, promising",
+   "special, rite, commemoration, thanks, wedding"
+  ],
+  "best": 12,
+  "pass": false
+ },
+ "opinion": {
+  "ranks": [
+   14
+  ],
+  "tops": [
+   "idea, thought, like, respect, eyes"
+  ],
+  "best": 14,
+  "pass": false
+ },
+ "security": {
+  "ranks": [
+   3,
+   157
+  ],
+  "tops": [
+   "safe, menace, security, independence, threaten",
+   "protection, shelter, watchman, police, patrol"
+  ],
+  "best": 3,
+  "pass": true
+ },
+ "height": {
+  "ranks": [
+   1
+  ],
+  "tops": [
+   "height, far, underground, next, air"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "game": {
+  "ranks": [
+   1
+  ],
+  "tops": [
+   "game, ball, player, football, running"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "logic": {
+  "ranks": [
+   15,
+   2030
+  ],
+  "tops": [
+   "statement, debate, data, plausible, argue",
+   "know, simple, way, install, instrument"
+  ],
+  "best": 15,
+  "pass": false
+ },
+ "intensity": {
+  "ranks": [
+   31,
+   165
+  ],
+  "tops": [
+   "diluted, crowded, size, much, strong",
+   "violent, want, sense, pleasure, passion"
+  ],
+  "best": 31,
+  "pass": false
+ },
+ "greed": {
+  "ranks": [
+   4,
+   5
+  ],
+  "tops": [
+   "pay, ask, poor, greed, finance",
+   "want, interest, wishing, impulse, greed"
+  ],
+  "best": 4,
+  "pass": false
+ },
+ "volleyball": {
+  "ranks": [
+   1,
+   4
+  ],
+  "tops": [
+   "volleyball, stroke, tennis, play, game",
+   "play, football, game, volleyball, league"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "exodus": {
+  "ranks": [
+   135,
+   25
+  ],
+  "tops": [
+   "community, return, park, army, outgoing",
+   "going, leaving, follow, come, last"
+  ],
+  "best": 25,
+  "pass": false
+ },
+ "talent": {
+  "ranks": [
+   99,
+   1096
+  ],
+  "tops": [
+   "know, training, work, good, trade",
+   "think, believe, court, approve, jury"
+  ],
+  "best": 99,
+  "pass": false
+ },
+ "fatigue": {
+  "ranks": [
+   2,
+   1
+  ],
+  "tops": [
+   "exhaustion, fatigue, weary, comfort, misery",
+   "fatigue, insomnia, exhaustion, numb, vigil"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "coma": {
+  "ranks": [
+   1,
+   384
+  ],
+  "tops": [
+   "coma, concussion, feel, unconscious, revive",
+   "death, outpatient, demand, dead, dependent"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "agriculture": {
+  "ranks": [
+   10,
+   2
+  ],
+  "tops": [
+   "feed, cultivation, agricultural, farming, farm",
+   "lawn, agriculture, agricultural, farm, garden"
+  ],
+  "best": 2,
+  "pass": true
+ },
+ "revolt": {
+  "ranks": [
+   8
+  ],
+  "tops": [
+   "overthrow, revolution, rebel, uplifting, cause"
+  ],
+  "best": 8,
+  "pass": false
+ },
+ "president": {
+  "ranks": [
+   6,
+   3
+  ],
+  "tops": [
+   "governor, kingdom, chancellor, sovereign, monarch",
+   "presidential, politician, president, presidency, chairman"
+  ],
+  "best": 3,
+  "pass": true
+ },
+ "awful": {
+  "ranks": [
+   8,
+   147
+  ],
+  "tops": [
+   "lousy, rotten, stinking, crappy, stinky",
+   "sick, concerned, nauseous, care, worry"
+  ],
+  "best": 8,
+  "pass": false
+ },
+ "hay": {
+  "ranks": [
+   6,
+   6
+  ],
+  "tops": [
+   "pasture, forage, graze, corn, lawn",
+   "timothy, mow, meadow, paper, lawn"
+  ],
+  "best": 6,
+  "pass": false
+ },
+ "deputy": {
+  "ranks": [
+   1,
+   11
+  ],
+  "tops": [
+   "deputy, officer, constable, direct, lieutenant",
+   "secretary, auxiliary, aide, staff, adjunct"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "diameter": {
+  "ranks": [
+   1
+  ],
+  "tops": [
+   "diameter, round, radius, quadrant, arc"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "upgrade": {
+  "ranks": [
+   13
+  ],
+  "tops": [
+   "convert, update, come, resume, oncoming"
+  ],
+  "best": 13,
+  "pass": false
+ },
+ "sack": {
+  "ranks": [
+   8,
+   46
+  ],
+  "tops": [
+   "sacking, balloon, suitcase, pocket, tape",
+   "balloon, suitcase, cell, bladder, trunk"
+  ],
+  "best": 8,
+  "pass": false
+ },
+ "summer": {
+  "ranks": [
+   1
+  ],
+  "tops": [
+   "summer, year, spring, date, winter"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "particle": {
+  "ranks": [
+   3,
+   32
+  ],
+  "tops": [
+   "affair, vacuum, particle, solid, little",
+   "bit, chip, part, hunk, strip"
+  ],
+  "best": 3,
+  "pass": true
+ },
+ "audit": {
+  "ranks": [
+   2,
+   5
+  ],
+  "tops": [
+   "register, audit, controller, ledger, posting",
+   "return, posting, register, file, audit"
+  ],
+  "best": 2,
+  "pass": true
+ },
+ "raid": {
+  "ranks": [
+   18,
+   1
+  ],
+  "tops": [
+   "vulnerable, hit, flash, outbreak, outburst",
+   "raid, detecting, manhunt, room, detective"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "owe": {
+  "ranks": [
+   8
+  ],
+  "tops": [
+   "repay, refund, resort, debt, reimburse"
+  ],
+  "best": 8,
+  "pass": false
+ },
+ "street": {
+  "ranks": [
+   2
+  ],
+  "tops": [
+   "driveway, street, highway, roadway, lane"
+  ],
+  "best": 2,
+  "pass": true
+ },
+ "thread": {
+  "ranks": [
+   2,
+   89
+  ],
+  "tops": [
+   "tape, thread, floss, fiber, tie",
+   "sewing, knitting, embroidery, section, sew"
+  ],
+  "best": 2,
+  "pass": true
+ },
+ "fiction": {
+  "ranks": [
+   6
+  ],
+  "tops": [
+   "coin, history, account, believe, include"
+  ],
+  "best": 6,
+  "pass": false
+ },
+ "decor": {
+  "ranks": [
+   3,
+   1
+  ],
+  "tops": [
+   "furniture, wallpaper, decor, bed, cabinet",
+   "decor, house, hall, room, floor"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "mess": {
+  "ranks": [
+   21,
+   5
+  ],
+  "tops": [
+   "soil, messy, dirt, say, grunge",
+   "neat, clutter, maze, tangle, mess"
+  ],
+  "best": 5,
+  "pass": false
+ },
+ "appreciation": {
+  "ranks": [
+   792,
+   50
+  ],
+  "tops": [
+   "appreciate, gratitude, thank, thankful, thanks",
+   "price, assessment, valuable, rating, appraisal"
+  ],
+  "best": 50,
+  "pass": false
+ },
+ "backpack": {
+  "ranks": [
+   1,
+   1
+  ],
+  "tops": [
+   "backpack, pocket, take, suitcase, sac",
+   "backpack, pants, booted, youth, arctic"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "coup": {
+  "ranks": [
+   3,
+   7
+  ],
+  "tops": [
+   "occupied, revolution, coup, junta, takeover",
+   "revolution, junta, occupied, presidential, enemy"
+  ],
+  "best": 3,
+  "pass": true
+ },
+ "basin": {
+  "ranks": [
+   9,
+   2
+  ],
+  "tops": [
+   "dishwasher, cleansing, spoon, bathing, shower",
+   "saucer, basin, platter, bowl, glass"
+  ],
+  "best": 2,
+  "pass": true
+ },
+ "fate": {
+  "ranks": [
+   86,
+   3
+  ],
+  "tops": [
+   "freedom, time, dominate, luck, free",
+   "pressure, starlight, fate, destiny, last"
+  ],
+  "best": 3,
+  "pass": true
+ },
+ "lion": {
+  "ranks": [
+   1,
+   1
+  ],
+  "tops": [
+   "lion, cougar, kitten, puma, cheetah",
+   "lion, brute, fox, brutality, rhino"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "plaque": {
+  "ranks": [
+   1070,
+   255
+  ],
+  "tops": [
+   "enamel, benjamin, sticker, built, tacky",
+   "reminder, image, recognition, note, notice"
+  ],
+  "best": 255,
+  "pass": false
+ },
+ "striker": {
+  "ranks": [
+   1,
+   18
+  ],
+  "tops": [
+   "striker, completion, goalkeeper, goalie, tackle",
+   "loose, hitter, running, passing, lineman"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "meme": {
+  "ranks": [
+   5618,
+   9596
+  ],
+  "tops": [
+   "joke, legend, gag, thing, likeness",
+   "wow, jest, gag, hoax, pass"
+  ],
+  "best": 5618,
+  "pass": false
+ },
+ "basketball": {
+  "ranks": [
+   1
+  ],
+  "tops": [
+   "basketball, volleyball, hoops, tennis, football"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "pink": {
+  "ranks": [
+   1,
+   2
+  ],
+  "tops": [
+   "pink, burgundy, crimson, stain, wine",
+   "red, pink, white, yellow, colorful"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "excess": {
+  "ranks": [
+   5,
+   40
+  ],
+  "tops": [
+   "extra, surplus, redundant, want, excess",
+   "much, numerous, maximum, margin, chunk"
+  ],
+  "best": 5,
+  "pass": false
+ },
+ "mighty": {
+  "ranks": [
+   43,
+   19
+  ],
+  "tops": [
+   "drastic, bad, hot, attack, blow",
+   "tall, formidable, bad, vast, terrific"
+  ],
+  "best": 19,
+  "pass": false
+ },
+ "tomorrow": {
+  "ranks": [
+   1,
+   2
+  ],
+  "tops": [
+   "tomorrow, eve, yesterday, morrow, last",
+   "morrow, tomorrow, eve, yesterday, last"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "yoga": {
+  "ranks": [
+   14
+  ],
+  "tops": [
+   "felt, crane, stance, comfortable, know"
+  ],
+  "best": 14,
+  "pass": false
+ },
+ "vulnerability": {
+  "ranks": [
+   41,
+   19
+  ],
+  "tops": [
+   "assault, defend, vulnerable, danger, protection",
+   "failing, flaw, bad, danger, hate"
+  ],
+  "best": 19,
+  "pass": false
+ },
+ "alive": {
+  "ranks": [
+   130
+  ],
+  "tops": [
+   "pant, gasp, respiration, choke, blown"
+  ],
+  "best": 130,
+  "pass": false
+ },
+ "leak": {
+  "ranks": [
+   260,
+   2
+  ],
+  "tops": [
+   "rain, moisture, fog, wet, rainfall",
+   "oil, leak, breakdown, broken, water"
+  ],
+  "best": 2,
+  "pass": true
+ },
+ "performance": {
+  "ranks": [
+   1
+  ],
+  "tops": [
+   "performance, production, drama, present, choreography"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "injury": {
+  "ranks": [
+   1,
+   1
+  ],
+  "tops": [
+   "injury, harm, trauma, fracture, pain",
+   "injury, wounded, harm, danger, trauma"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "deficiency": {
+  "ranks": [
+   41
+  ],
+  "tops": [
+   "want, poor, easy, depleted, take"
+  ],
+  "best": 41,
+  "pass": false
+ },
+ "scroll": {
+  "ranks": [
+   1359
+  ],
+  "tops": [
+   "lower, come, duck, run, step"
+  ],
+  "best": 1359,
+  "pass": false
+ },
+ "bandwidth": {
+  "ranks": [
+   1,
+   1
+  ],
+  "tops": [
+   "bandwidth, supply, net, website, protocol",
+   "bandwidth, velocity, broadband, connect, radio"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "inaccurate": {
+  "ranks": [
+   2040,
+   21
+  ],
+  "tops": [
+   "false, misunderstanding, error, wrong, err",
+   "fine, misinformation, approximate, one, incorrect"
+  ],
+  "best": 21,
+  "pass": false
+ },
+ "texture": {
+  "ranks": [
+   1,
+   1
+  ],
+  "tops": [
+   "texture, textured, polish, nap, sense",
+   "texture, smooth, velvet, pleasure, sense"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "summit": {
+  "ranks": [
+   1,
+   118
+  ],
+  "tops": [
+   "summit, crest, vertex, apex, hilltop",
+   "intersect, come, apex, attain, conference"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "unemployed": {
+  "ranks": [
+   17,
+   17
+  ],
+  "tops": [
+   "recruit, unpaid, employment, recreational, author",
+   "service, retirement, holiday, vacation, enjoy"
+  ],
+  "best": 17,
+  "pass": false
+ },
+ "preserve": {
+  "ranks": [
+   5
+  ],
+  "tops": [
+   "maintain, jam, save, conservation, preserve"
+  ],
+  "best": 5,
+  "pass": false
+ },
+ "nonprofit": {
+  "ranks": [
+   1,
+   4
+  ],
+  "tops": [
+   "nonprofit, industry, operation, job, enterprise",
+   "party, industry, pay, nonprofit, enterprise"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "hot": {
+  "ranks": [
+   1,
+   2
+  ],
+  "tops": [
+   "hot, heat, incubation, cool, warm",
+   "cool, hot, fire, temperature, warmth"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "unpopular": {
+  "ranks": [
+   146,
+   7
+  ],
+  "tops": [
+   "disgust, difference, dislike, horror, world",
+   "resistance, opposition, refuse, criticism, eyes"
+  ],
+  "best": 7,
+  "pass": false
+ },
+ "convenient": {
+  "ranks": [
+   232,
+   29
+  ],
+  "tops": [
+   "convenience, simple, available, provide, elementary",
+   "adapt, wait, design, put, adjustment"
+  ],
+  "best": 29,
+  "pass": false
+ },
+ "fair": {
+  "ranks": [
+   13,
+   824
+  ],
+  "tops": [
+   "disciplined, sportsmanship, principle, law, comply",
+   "lefty, finger, slap, nearby, hold"
+  ],
+  "best": 13,
+  "pass": false
+ },
+ "sail": {
+  "ranks": [
+   9,
+   24
+  ],
+  "tops": [
+   "navigate, sailing, boat, voyage, boating",
+   "voyage, boat, sailing, navigate, conn"
+  ],
+  "best": 9,
+  "pass": false
+ },
+ "slam": {
+  "ranks": [
+   5
+  ],
+  "tops": [
+   "ring, close, whisper, knocking, slam"
+  ],
+  "best": 5,
+  "pass": false
+ },
+ "prison": {
+  "ranks": [
+   1,
+   2
+  ],
+  "tops": [
+   "prison, jail, captivity, nick, screw",
+   "dungeon, prison, bullpen, lockdown, screw"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "snake": {
+  "ranks": [
+   1,
+   2512
+  ],
+  "tops": [
+   "snake, lizard, serpent, toad, frog",
+   "addition, computer, simple, one, total"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "stress": {
+  "ranks": [
+   502,
+   390
+  ],
+  "tops": [
+   "fear, concerned, restless, care, terror",
+   "ragged, problem, collapse, exhaustion, fatigue"
+  ],
+  "best": 390,
+  "pass": false
+ },
+ "cloth": {
+  "ranks": [
+   19
+  ],
+  "tops": [
+   "thread, tammy, flannel, lining, laundry"
+  ],
+  "best": 19,
+  "pass": false
+ },
+ "mistake": {
+  "ranks": [
+   4
+  ],
+  "tops": [
+   "injury, hap, coincidence, mistake, error"
+  ],
+  "best": 4,
+  "pass": false
+ },
+ "rash": {
+  "ranks": [
+   1,
+   7
+  ],
+  "tops": [
+   "rash, hives, itching, itch, huff",
+   "allergic, thorn, itchy, annoying, itching"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "dominant": {
+  "ranks": [
+   12,
+   2034
+  ],
+  "tops": [
+   "dominated, supremacy, dominate, mastery, force",
+   "cream, chief, team, maximum, side"
+  ],
+  "best": 12,
+  "pass": false
+ },
+ "cab": {
+  "ranks": [
+   1
+  ],
+  "tops": [
+   "cab, backseat, chair, frontal, saddle"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "plasma": {
+  "ranks": [
+   4,
+   2618
+  ],
+  "tops": [
+   "serum, lymph, red, plasma, congestion",
+   "light, burn, video, color, sensor"
+  ],
+  "best": 4,
+  "pass": false
+ },
+ "rank": {
+  "ranks": [
+   388
+  ],
+  "tops": [
+   "raise, hierarchical, height, summit, grade"
+  ],
+  "best": 388,
+  "pass": false
+ },
+ "boulder": {
+  "ranks": [
+   20
+  ],
+  "tops": [
+   "pebble, bad, giant, significant, rocky"
+  ],
+  "best": 20,
+  "pass": false
+ },
+ "policy": {
+  "ranks": [
+   1
+  ],
+  "tops": [
+   "policy, program, strategy, code, law"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "quarantine": {
+  "ranks": [
+   1,
+   1
+  ],
+  "tops": [
+   "quarantine, epidemic, infect, contagion, septic",
+   "quarantine, alone, epidemic, week, journey"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "edit": {
+  "ranks": [
+   10
+  ],
+  "tops": [
+   "rewrite, written, amendment, alter, become"
+  ],
+  "best": 10,
+  "pass": false
+ },
+ "sculpture": {
+  "ranks": [
+   11
+  ],
+  "tops": [
+   "artificial, artistic, literature, magic, paint"
+  ],
+  "best": 11,
+  "pass": false
+ },
+ "porch": {
+  "ranks": [
+   4,
+   147
+  ],
+  "tops": [
+   "room, backdoor, doorway, porch, indoor",
+   "gallery, backyard, hall, cottage, yard"
+  ],
+  "best": 4,
+  "pass": false
+ },
+ "economy": {
+  "ranks": [
+   9,
+   1
+  ],
+  "tops": [
+   "pay, depression, economic, fortune, cost",
+   "economy, economic, company, cost, expenditure"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "bolt": {
+  "ranks": [
+   1
+  ],
+  "tops": [
+   "bolt, thunderbolt, spark, flicker, thunder"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "conventional": {
+  "ranks": [
+   47
+  ],
+  "tops": [
+   "unusual, pattern, familiar, heritage, ritual"
+  ],
+  "best": 47,
+  "pass": false
+ },
+ "bridge": {
+  "ranks": [
+   1
+  ],
+  "tops": [
+   "bridge, elbow, ways, street, roadway"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "penguin": {
+  "ranks": [
+   1,
+   1
+  ],
+  "tops": [
+   "penguin, seagull, crow, merlin, martin",
+   "penguin, pelican, falcon, hawk, duck"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "breed": {
+  "ranks": [
+   9,
+   3
+  ],
+  "tops": [
+   "pup, poodle, wolf, adult, chief",
+   "beef, cattle, breed, veal, herd"
+  ],
+  "best": 3,
+  "pass": true
+ },
+ "pathway": {
+  "ranks": [
+   27,
+   35
+  ],
+  "tops": [
+   "track, tour, come, head, circuit",
+   "cross, downhill, chase, bush, field"
+  ],
+  "best": 27,
+  "pass": false
+ },
+ "behavior": {
+  "ranks": [
+   3
+  ],
+  "tops": [
+   "manner, thing, behavior, behave, comply"
+  ],
+  "best": 3,
+  "pass": true
+ },
+ "autonomy": {
+  "ranks": [
+   17,
+   44
+  ],
+  "tops": [
+   "independent, independence, country, collected, sovereign",
+   "authority, discretion, law, claim, independence"
+  ],
+  "best": 17,
+  "pass": false
+ },
+ "confuse": {
+  "ranks": [
+   229,
+   150
+  ],
+  "tops": [
+   "include, add, information, mystery, analysis",
+   "data, face, question, set, matter"
+  ],
+  "best": 150,
+  "pass": false
+ },
+ "slap": {
+  "ranks": [
+   1
+  ],
+  "tops": [
+   "slap, spank, strike, raw, fist"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "ongoing": {
+  "ranks": [
+   4,
+   5
+  ],
+  "tops": [
+   "incomplete, done, untouched, ongoing, underway",
+   "underway, incomplete, going, old, ongoing"
+  ],
+  "best": 4,
+  "pass": false
+ },
+ "legitimate": {
+  "ranks": [
+   529
+  ],
+  "tops": [
+   "illegal, ineligible, banned, valid, law"
+  ],
+  "best": 529,
+  "pass": false
+ },
+ "stable": {
+  "ranks": [
+   31
+  ],
+  "tops": [
+   "consolidate, stability, ensure, conservative, assure"
+  ],
+  "best": 31,
+  "pass": false
+ },
+ "wrap": {
+  "ranks": [
+   27
+  ],
+  "tops": [
+   "rag, towel, tape, cover, dress"
+  ],
+  "best": 27,
+  "pass": false
+ },
+ "overthrow": {
+  "ranks": [
+   1,
+   190
+  ],
+  "tops": [
+   "overthrow, rob, influence, pressure, dig",
+   "governor, country, nation, president, policy"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "radical": {
+  "ranks": [
+   69,
+   56
+  ],
+  "tops": [
+   "become, developed, conservative, revolution, crucial",
+   "mild, conservative, become, reactionary, liberal"
+  ],
+  "best": 56,
+  "pass": false
+ },
+ "severe": {
+  "ranks": [
+   8
+  ],
+  "tops": [
+   "raging, frivolous, thing, modify, brutal"
+  ],
+  "best": 8,
+  "pass": false
+ },
+ "intensive": {
+  "ranks": [
+   1938,
+   4325
+  ],
+  "tops": [
+   "different, way, excellent, much, try",
+   "try, easy, attempt, difficulty, quick"
+  ],
+  "best": 1938,
+  "pass": false
+ },
+ "proud": {
+  "ranks": [
+   20,
+   18
+  ],
+  "tops": [
+   "pride, glad, beautiful, admiration, happy",
+   "beaming, pride, delighted, sure, happy"
+  ],
+  "best": 18,
+  "pass": false
+ },
+ "modern": {
+  "ranks": [
+   17,
+   15
+  ],
+  "tops": [
+   "update, revised, upgrade, latest, novel",
+   "past, today, tomorrow, coming, innovative"
+  ],
+  "best": 15,
+  "pass": false
+ },
+ "bother": {
+  "ranks": [
+   1
+  ],
+  "tops": [
+   "bother, annoy, interrupt, irritate, trouble"
+  ],
+  "best": 1,
+  "pass": true
+ },
+ "expand": {
+  "ranks": [
+   3,
+   10
+  ],
+  "tops": [
+   "increase, grow, expand, enlarge, augment",
+   "increase, inflatable, bladder, inflate, enlarge"
+  ],
+  "best": 3,
+  "pass": true
+ },
+ "abandon": {
+  "ranks": [
+   1522
+  ],
+  "tops": [
+   "abandonment, thing, leave, person, desolate"
+  ],
+  "best": 1522,
+  "pass": false
+ }
+}

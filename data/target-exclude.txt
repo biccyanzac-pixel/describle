@@ -148,6 +148,7 @@ sensual
 lust
 hugging
 choke
+slit
 
 # names more than words
 josh
@@ -251,6 +252,7 @@ pad
 gee
 cos
 favour
+fracture
 juice
 hedge
 stunt
@@ -297,6 +299,9 @@ intimate
 cant
 wont
 var
+
+# passed the playtest only by an unusual route; the way most people would describe it fails
+earn
 
 # too vague, or a dull abstract
 level

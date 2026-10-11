@@ -28,6 +28,17 @@ test('vector file matches its vocabulary', { skip: !built && 'run pipeline/build
   }
 });
 
+test('the AI never guesses a word the description uses (any form or stem)', { skip: !built && 'run pipeline/build.mjs' }, async () => {
+  const V = await makeVocab(meta, bin);
+  const hit = V.mentionedIn('a small animal that catches mice and has whiskers');
+  for (const w of ['mouse', 'catch', 'animal', 'whisker', 'small']) if (V.index.has(w)) assert.ok(hit.has(V.index.get(w)), w);
+  assert.ok(!hit.has(V.index.get('cat')));
+  // and guess() leaves them out of the top
+  const q = new Float32Array(meta.dim); q[0] = 1;
+  const { scores } = V.guess(q, 5, { mentioned: 'mice' });
+  assert.equal(scores[V.index.get('mouse')], -9);
+});
+
 test('the browser path reproduces the tuner on every clue set', { skip: !built && 'run pipeline/build.mjs', timeout: 300000 }, async () => {
   const { nodeEmbedder } = await import('../pipeline/node-embed.mjs');
   const tune = JSON.parse(fs.readFileSync(new URL('../data/tune.json', import.meta.url), 'utf8'));

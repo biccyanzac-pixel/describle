@@ -39,6 +39,22 @@ score(word) = max over the word's 2 most used senses k of
 - **The word itself isn't embedded:** with sense counts in place it added nothing on any setting, and leaving it out saves 15k vectors (5.8 MB).
 - **Correct guess:** the top word is the target or a variant of it (same stem or an inflection, the same rule as the ban check). "emptiness" counts for "empty".
 
+### Mentioned words (added at launch)
+The AI never guesses a word the description itself uses, in any form or with the same stem (`vocab.guess(q, k, { mentioned: text })`). Nobody describes a mouse as "the animal that catches mice", and without this rule such descriptions pulled the guess to the mentioned word ("…catches mice…" → mouse).
+
+Measured with `node pipeline/try.mjs --file …` (right first time, before → after):
+
+| Clue set | Before | After |
+|---|---|---|
+| dev | 60% | 64% |
+| test | 40% | 43% |
+| test-2 | 33% | 38% |
+| the first 56 scheduled words, 2 descriptions each | 25% | 31% |
+
+It doesn't change the vectors. The tuner's numbers above are without it.
+
+**Banned words make the game harder than these numbers.** The clue sets were written without looking at each day's banned words, which are by design the most natural words to use. Real play is closer to the playtests in docs/schedule.md, where about half of all words passed.
+
 ### How the weights were chosen (`pipeline/tune.mjs`)
 - **Clue sets:** I wrote 301 clues by hand in three sets, each clue in a player's voice and none containing its target (`data/clues-*.json`).
 - **Grid:** 576 settings, chosen **only on the dev set**. Each line below is the best dev result (right first / in top 5, of 101) with that one setting fixed:

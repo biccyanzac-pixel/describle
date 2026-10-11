@@ -1,9 +1,9 @@
 # The daily schedule (Phase 3)
 
-Status: **done, waiting for the owner's review.** Phase 4 (game UI, scoring, share, leaderboard) hasn't started.
+Status: **live since 11 Oct 2026** (puzzle #1 = launch day, `EPOCH` in `site/js/daily.js`).
 
 ## What ships
-`site/data/schedule-v1.json` (166 KB) holds one entry per UTC day from `EPOCH` (provisionally **Monday 12 Oct 2026**, see "Launch day") for **105 weeks (735 days, to 15 Oct 2028)**. Each entry has:
+`site/data/schedule-v1.json` (166 KB) holds one entry per UTC day from `EPOCH` (**Sunday 11 Oct 2026**, launch day) for **105 weeks (735 days, to 14 Oct 2028)**. Each entry has:
 - **`word`, `pos`, `pool` and `def`:** the target, its part of speech, the weekday pool it came from, and its main WordNet definition, shown on the reveal.
 - **`banned`:** the 5 banned words.
 - **`related`:** close compounds for the ban check (e.g. kingdom for king).
@@ -69,6 +69,25 @@ A target must be in the game's 15k vocabulary and pass all of these:
 - **Why things fail:** mostly the banned words gut the definition. For *case* it leaves "an of something", for *police* "the force of and". Those words would be miserable puzzles anyway.
 - **Caveat:** this check is lenient, since the definition it starts from is itself in the vector file (docs/vocab.md). Its job is to catch targets the ban rules make impossible. The difficulty split and the curation do the rest.
 
+## Playtests: can a player get it? (`pipeline/playtest.mjs`, added at launch)
+The validation above is lenient, and real descriptions showed it. Many scheduled words weren't gettable with natural descriptions that obey the banned words (the launch-day word "earn": "get money in return for your work" → #31).
+
+So every word gets **playtested** before it goes live:
+- **The check:** someone writes 2 descriptions the way a player would, respecting the ban rules. The tool rejects any that break them. The word **passes if one of them puts it in the AI's top 3**. Descriptions are written once, never tuned until they pass.
+- **Failed words are dropped** by `schedule.mjs` (`data/playtest.json` → `data/playtest-results.json`).
+- **Enforced:** `npm test` fails if any of the next 2 weeks lacks a passing playtest.
+- **At launch:** 148 words were playtested, and **72 passed (49%)**, so the next 8 weeks (56 days) are all playtested words. Verbs and adjectives (the Sunday pool) pass least often, about 25%.
+
+**Keep 8 weeks ahead playtested** (about once a month):
+```
+node pipeline/playtest.mjs --todo 8          # the next 8 weeks' words without a playtest, with their banned words
+# write 2 descriptions each, as a player would, into a JSON file { word: [d1, d2] }, then:
+node pipeline/playtest-add.mjs that-file.json && node pipeline/playtest.mjs
+node pipeline/schedule.mjs --keep-until <today>   # failed words drop out; repeat --todo until it says 0
+.venv/Scripts/python pipeline/check-schedule-words.py && npm test
+```
+`node pipeline/try.mjs <word> "description" …` tries descriptions against any word without recording them.
+
 ## Curation (by reading every word)
 - **What I did:** I read every scheduled word with its banned words, over several rounds. Anything vague, misleading or awkward went into **`data/target-exclude.txt`**, grouped by reason. That came to about 520 words. The groups:
   - **vague:** level, system, thing, way, process, factor
@@ -91,10 +110,8 @@ Each suspect is either excluded or listed in **`data/checked-ok.txt`** with the 
 - **No repeats in 735 days:** no word twice, no variants (dog/dogs), and no spelling twins (aluminum/aluminium; each is the other's banned word).
 - **Golden days:** `test/fixtures/schedule-golden.json` pins the first 28 days, and `npm test` fails if a rebuild changes them.
 
-## Launch day (decide in Phase 4)
-- **`EPOCH` is provisional** (`site/js/daily.js`, 2026-10-12).
-- **Before launch:** set it to the launch date, rerun `node pipeline/schedule.mjs --epoch <date>` (the same words, re-dated), then `node pipeline/pin-golden.mjs`.
-- **After launch,** never change it.
+## Launch day
+`EPOCH` is 2026-10-11, launch day, so puzzle #1 was "download". It was set by re-dating the curated schedule (`--epoch`; the same words) and re-pinning the golden days. **Never change it now.** Days up to today are frozen with `--keep-until <today>`.
 
 ## Maintaining it (after launch)
 - **Remove a word from future days:** add it to `data/target-exclude.txt`, then run:

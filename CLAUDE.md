@@ -3,7 +3,9 @@
 **Start with docs/status.md** (where things stand, what's decided, what's next, how to run everything). Then the doc for the part you're changing: docs/model.md (model + iPhone), docs/vocab.md (vocabulary, guess rule, ban check), docs/schedule.md (daily words). House rules for all jacob.gg games: `../jacob.gg/PLAYBOOK.md`.
 
 Critical rules:
-- Phased build. STOP for the owner's review after each phase (1 model bench, 2 vocabulary + vectors + ban check, 3 schedule + validation, 4 UI + scoring + share + leaderboard).
+- The game is LIVE (since 11 Oct 2026). Players depend on today's and past days: test changes locally first (`npm test`, `node tools/e2e-ui.mjs` against a local worker).
+- Playtest upcoming words (`node pipeline/playtest.mjs --todo 8`, docs/schedule.md "Playtests"): `npm test` fails when the next 2 weeks aren't playtested. Write descriptions as a player would, respecting the banned words; never rewrite one until it passes.
+- The worker bundles `site/js/{daily,ban,scoring}.js` and `site/data/{schedule,vocab}-v1.json`: redeploy it (`cd worker && npx wrangler deploy`) whenever they change, or the server will judge with old rules.
 - Never change a past or current day once live. That covers the schedule (`node pipeline/schedule.mjs --keep-until <today>`), `EPOCH` in `site/js/daily.js` (set at launch, then never changed), and the vocabulary/vectors (`site/data/vocab-v*.json`, `vectors-v*.bin`): they decide what the model guesses. A rebuild gets a new `VOCAB_VERSION` and old days keep the old files.
 - iPhone: the browser runs ONNX Runtime Web **1.18.0** (`site/vendor/ort/`), the last release with a single-threaded build. Every later ORT build needs shared WASM memory, which iOS Safari runs out of on repeat visits. Don't upgrade ORT or bring back Transformers.js in the browser without retesting on a real iPhone (`/bench/` → "Run phone test").
 - The model is pinned: `Xenova/all-MiniLM-L6-v2` at commit `751bff3…`, from the HF Hub with an automatic fallback to `site/models/` (same files).

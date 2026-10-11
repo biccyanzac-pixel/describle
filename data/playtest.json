@@ -1,0 +1,660 @@
+{
+ "earn": [
+  "get money in return for your work",
+  "deserve something because you worked for it"
+ ],
+ "download": [
+  "copy a file from the internet onto your computer",
+  "save something from a website to your phone"
+ ],
+ "practical": [
+  "useful and sensible rather than theoretical",
+  "down to earth, good at getting real things done"
+ ],
+ "aware": [
+  "knowing that something is happening",
+  "conscious of something, you notice it",
+  "noticing what is going on around you",
+  "informed and alert about a situation"
+ ],
+ "consult": [
+  "ask an expert for advice",
+  "go to a doctor or lawyer to get their opinion"
+ ],
+ "fail": [
+  "not succeed at something",
+  "get it wrong and not pass the exam"
+ ],
+ "prove": [
+  "show that something is true with evidence",
+  "demonstrate a fact beyond doubt",
+  "establish that something is definitely true",
+  "confirm a claim with facts"
+ ],
+ "compete": [
+  "try to win against others in a contest",
+  "take part in a race or rivalry",
+  "take part in a contest against others",
+  "try to beat other teams in a tournament"
+ ],
+ "cat": [
+  "furry pet that purrs and meows",
+  "small animal that catches mice and has whiskers"
+ ],
+ "cricket": [
+  "english sport with a bat, ball and wickets",
+  "chirping insect that jumps"
+ ],
+ "curry": [
+  "spicy indian dish with sauce and rice",
+  "hot food made with spices like turmeric"
+ ],
+ "concrete": [
+  "grey building material made from cement and sand",
+  "hard stuff pavements are made of"
+ ],
+ "bowl": [
+  "round dish you eat cereal or soup from",
+  "deep round container for food"
+ ],
+ "shoulder": [
+  "joint where your arm meets your body",
+  "body part you carry a bag on"
+ ],
+ "salt": [
+  "white seasoning you sprinkle on chips",
+  "what makes sea water taste salty"
+ ],
+ "boat": [
+  "small vessel that floats on water",
+  "you row or sail it on a lake"
+ ],
+ "bulb": [
+  "glass thing in a lamp that gives light",
+  "you plant it and a tulip grows"
+ ],
+ "hip": [
+  "joint between your leg and your waist",
+  "body part at the side below the waist",
+  "the joint you swing when you walk, at the side below your belly",
+  "body part people wiggle when they dance, where your trousers sit"
+ ],
+ "polymer": [
+  "long chain molecule like plastic",
+  "large molecule made of repeating units",
+  "chemical made of long chains of repeated units",
+  "big chain-like compound that rubber and proteins are made of"
+ ],
+ "livestock": [
+  "farm animals like cows and sheep",
+  "animals raised on a farm for food",
+  "sheep, pigs and goats kept for food",
+  "animals raised by ranchers"
+ ],
+ "peanut": [
+  "nut in a shell that grows underground, used for butter",
+  "salty snack nut monkeys and elephants eat"
+ ],
+ "laptop": [
+  "portable computer you can fold shut",
+  "computer you carry around and use on your lap",
+  "a folding pc you can carry in a bag",
+  "a small machine with a keyboard and screen that folds shut"
+ ],
+ "altar": [
+  "table in a church where priests stand",
+  "sacred table for offerings in a temple"
+ ],
+ "organ": [
+  "body part like the heart or liver",
+  "huge church instrument with pipes"
+ ],
+ "journalism": [
+  "the job of writing news for newspapers",
+  "reporting the news as a profession",
+  "the profession of writing articles for magazines and papers",
+  "the trade of the press, writing stories about current events"
+ ],
+ "knot": [
+  "what you tie in a rope or shoelace",
+  "tangle tied in string",
+  "twisted loop in a rope that holds it tight",
+  "sailors learn to make many kinds, like a reef or a bowline"
+ ],
+ "keeper": [
+  "person who looks after something, like a zoo",
+  "goalie who stops the ball"
+ ],
+ "presidency": [
+  "the time someone is in office as head of state",
+  "the job of running a country as its leader"
+ ],
+ "hospitality": [
+  "being friendly and welcoming to guests",
+  "the hotel and restaurant industry",
+  "friendly treatment of visitors in your home",
+  "making strangers feel at home with food and a bed"
+ ],
+ "theorem": [
+  "a maths statement that has been proved",
+  "pythagoras is a famous one in geometry"
+ ],
+ "disturbance": [
+  "something that interrupts the peace and quiet",
+  "a commotion or noisy trouble"
+ ],
+ "guard": [
+  "person who protects a building or prisoners",
+  "security person standing watch at the gate"
+ ],
+ "cargo": [
+  "goods carried on a ship or plane",
+  "freight loaded into a lorry"
+ ],
+ "zinc": [
+  "bluish metal used to coat steel",
+  "metal element in batteries and galvanising",
+  "bluish grey chemical element used to galvanise steel",
+  "element in sunscreen and batteries, atomic number 30"
+ ],
+ "bracelet": [
+  "jewellery worn around your wrist",
+  "chain or band on the wrist",
+  "a band or chain worn round the arm near the hand",
+  "a bangle or charm band worn on your arm"
+ ],
+ "rainfall": [
+  "the amount of rain that falls",
+  "water dropping from clouds"
+ ],
+ "tin": [
+  "metal can that food comes in",
+  "soft silver metal",
+  "soft silvery element used to coat cans",
+  "can of beans or soup"
+ ],
+ "driveway": [
+  "short private road from the street to your garage",
+  "where you park your car in front of the house"
+ ],
+ "hut": [
+  "small simple shelter in the woods",
+  "tiny wooden shack"
+ ],
+ "jelly": [
+  "wobbly sweet dessert",
+  "fruit spread you put on toast"
+ ],
+ "analogy": [
+  "comparing two things to explain one",
+  "a comparison that shows a similarity",
+  "explaining something by saying it is like something else",
+  "a way of explaining one idea using another that works the same way"
+ ],
+ "award": [
+  "a prize given for achievement",
+  "trophy or medal you win",
+  "something given to a person to recognise an achievement, like an oscar",
+  "you receive it at a ceremony for doing well"
+ ],
+ "opinion": [
+  "what you personally think about something",
+  "your view or belief, not a fact"
+ ],
+ "security": [
+  "being safe and protected from danger",
+  "guards and locks that keep a place safe",
+  "freedom from danger or threat",
+  "guards and cctv that keep intruders out of a building"
+ ],
+ "height": [
+  "how tall something is",
+  "distance from the bottom to the top"
+ ],
+ "game": [
+  "something you play for fun, with rules",
+  "a match or sport played to win"
+ ],
+ "logic": [
+  "reasoning in a clear and correct way",
+  "thinking that follows rules of argument",
+  "the study of valid arguments and sound conclusions",
+  "making sense step by step, like a computer or spock"
+ ],
+ "intensity": [
+  "how strong or extreme something is",
+  "great strength of feeling or force",
+  "how powerful or concentrated something is",
+  "the degree of force or feeling"
+ ],
+ "greed": [
+  "wanting more money than you need",
+  "selfish desire for more and more"
+ ],
+ "volleyball": [
+  "sport where you hit a ball over a high net with your hands",
+  "beach sport with a net and two teams"
+ ],
+ "exodus": [
+  "lots of people leaving a place at once",
+  "mass departure, like moses leading people out of egypt"
+ ],
+ "talent": [
+  "natural skill or ability",
+  "being gifted at something",
+  "natural knack for doing something well",
+  "what judges look for on the x factor"
+ ],
+ "fatigue": [
+  "extreme tiredness",
+  "exhaustion after hard work",
+  "feeling of being worn out and needing rest",
+  "sleepiness and lack of energy after a long effort"
+ ],
+ "coma": [
+  "long deep unconsciousness after an injury",
+  "state where a patient can't wake up",
+  "long deep state of no awareness after a brain injury",
+  "a patient on life support who won't respond for weeks"
+ ],
+ "agriculture": [
+  "farming crops and animals",
+  "growing food on farms",
+  "growing crops and raising animals for food",
+  "the industry of fields, tractors and harvests"
+ ],
+ "revolt": [
+  "people rising up against their rulers",
+  "a rebellion"
+ ],
+ "president": [
+  "head of state elected to lead a country",
+  "the leader who lives in the white house"
+ ],
+ "awful": [
+  "really bad, terrible",
+  "dreadful and unpleasant",
+  "very bad, really unpleasant",
+  "how you feel when you have the flu"
+ ],
+ "hay": [
+  "dried grass fed to horses",
+  "dry grass stored in bales in a barn"
+ ],
+ "deputy": [
+  "second in command who helps the sheriff",
+  "assistant who stands in for the boss"
+ ],
+ "diameter": [
+  "width of a circle straight through the middle",
+  "twice the radius"
+ ],
+ "upgrade": [
+  "improve something to a better version",
+  "move up to a newer model"
+ ],
+ "sack": [
+  "large bag made of rough cloth",
+  "big bag for carrying potatoes or coal"
+ ],
+ "summer": [
+  "hottest season of the year",
+  "the warm months when schools have holidays"
+ ],
+ "particle": [
+  "tiny bit of matter",
+  "very small piece like a speck of dust"
+ ],
+ "audit": [
+  "official check of a company's accounts",
+  "inspection of financial records",
+  "accountants going through a company's books",
+  "official review of financial records by the tax office"
+ ],
+ "raid": [
+  "sudden attack on a place",
+  "police bursting into a building to search it"
+ ],
+ "owe": [
+  "have to pay money back to someone",
+  "be in debt to someone"
+ ],
+ "street": [
+  "road in a town lined with houses and shops",
+  "a road with pavements in a city"
+ ],
+ "thread": [
+  "thin string used for sewing",
+  "you put it through a needle"
+ ],
+ "fiction": [
+  "made up stories, not true",
+  "novels about imaginary events"
+ ],
+ "decor": [
+  "how a room is decorated and furnished",
+  "the style of furniture and decoration in a home",
+  "the style of a room's colours, curtains and furnishings",
+  "interior design of a home"
+ ],
+ "mess": [
+  "untidy dirty state, things everywhere",
+  "a chaotic jumble that needs tidying"
+ ],
+ "appreciation": [
+  "being grateful and valuing something",
+  "recognising the worth of something"
+ ],
+ "backpack": [
+  "bag with two straps you carry on your shoulders",
+  "rucksack that hikers and school kids wear"
+ ],
+ "coup": [
+  "sudden seizing of power from a government by the army",
+  "generals overthrow the president"
+ ],
+ "basin": [
+  "bowl you wash your hands in",
+  "a large round dish for holding liquid"
+ ],
+ "fate": [
+  "what is meant to happen in your life, beyond your control",
+  "the force that decides your future, written in the stars"
+ ],
+ "lion": [
+  "big cat with a mane, king of the jungle",
+  "african predator that roars and lives in a pride"
+ ],
+ "plaque": [
+  "sticky film on teeth that causes decay",
+  "a metal sign on a wall in memory of someone"
+ ],
+ "striker": [
+  "forward in soccer whose job is to score goals",
+  "attacking player who puts the ball in the net"
+ ],
+ "meme": [
+  "funny picture with a caption shared online",
+  "joke that spreads across the internet"
+ ],
+ "basketball": [
+  "sport where you bounce a ball and shoot it through a hoop",
+  "game played by the lakers and the nba"
+ ],
+ "pink": [
+  "pale red colour, like candyfloss",
+  "the colour of flamingos and piglets"
+ ],
+ "excess": [
+  "more than is needed, too much",
+  "an amount over the limit"
+ ],
+ "mighty": [
+  "very powerful and impressive",
+  "huge and full of power, like a giant",
+  "enormously forceful, like a huge army",
+  "very great and impressive in size and force"
+ ],
+ "tomorrow": [
+  "the day after this one",
+  "the next day"
+ ],
+ "yoga": [
+  "stretching poses and breathing on a mat",
+  "exercise with poses like downward dog"
+ ],
+ "vulnerability": [
+  "being open to attack or getting hurt",
+  "weakness that leaves you exposed"
+ ],
+ "alive": [
+  "living, not dead",
+  "breathing and with a heartbeat"
+ ],
+ "leak": [
+  "water dripping from a pipe or roof",
+  "a crack where liquid or gas escapes"
+ ],
+ "performance": [
+  "a show on stage for an audience",
+  "a concert or play put on for people"
+ ],
+ "injury": [
+  "damage to your body, like a broken bone",
+  "getting hurt in an accident or sport"
+ ],
+ "deficiency": [
+  "not having enough of something you need",
+  "a lack, like too little iron in your blood"
+ ],
+ "scroll": [
+  "rolled up paper or parchment, like an ancient document",
+  "move down a web page with your finger or mouse wheel"
+ ],
+ "bandwidth": [
+  "how much data your internet connection can carry",
+  "the speed capacity of a network link"
+ ],
+ "inaccurate": [
+  "not correct, containing mistakes",
+  "wrong, not precise"
+ ],
+ "texture": [
+  "how a surface feels when you touch it, rough or smooth",
+  "the feel of a surface, like silky or bumpy"
+ ],
+ "summit": [
+  "the very top of a peak",
+  "meeting of world leaders, or the highest point you can reach"
+ ],
+ "unemployed": [
+  "without work, looking for a paid position",
+  "out of work and on benefits"
+ ],
+ "preserve": [
+  "keep something from going bad or being destroyed",
+  "protect old buildings or pickle fruit so it lasts"
+ ],
+ "nonprofit": [
+  "organisation that doesn't aim to make money",
+  "a group like a food bank that runs for a cause, not profit"
+ ],
+ "hot": [
+  "high temperature, like a summer day or a stove",
+  "burning to touch, the opposite of cold"
+ ],
+ "unpopular": [
+  "not liked by many people",
+  "a decision most people disapprove of"
+ ],
+ "convenient": [
+  "easy and handy, saving you time",
+  "fitting in well with your plans, like a shop just round the corner"
+ ],
+ "fair": [
+  "treating everyone equally, playing by the rules",
+  "just and even-handed, no cheating"
+ ],
+ "sail": [
+  "travel across the sea in a yacht using the wind",
+  "steer a ship over the ocean"
+ ],
+ "slam": [
+  "shut a door hard and loud",
+  "close something with a loud bang in anger"
+ ],
+ "prison": [
+  "where criminals are locked up behind bars",
+  "building with cells and guards for convicts"
+ ],
+ "snake": [
+  "long legless reptile that slithers and hisses",
+  "a python or adder"
+ ],
+ "stress": [
+  "feeling under pressure and worried",
+  "strain from too much work and worry"
+ ],
+ "cloth": [
+  "material that clothes are sewn from",
+  "piece of cotton or wool used for cleaning or sewing"
+ ],
+ "mistake": [
+  "something done wrong by accident",
+  "an error you didn't mean to make"
+ ],
+ "rash": [
+  "red itchy spots on the skin",
+  "skin irritation from an allergy"
+ ],
+ "dominant": [
+  "in control, the most powerful one",
+  "top dog, the strongest in the group"
+ ],
+ "cab": [
+  "car you hail and pay to take you somewhere",
+  "front part of a lorry where the driver sits"
+ ],
+ "plasma": [
+  "the yellowish fluid part of blood",
+  "a hot glowing state of matter, like in a tv screen"
+ ],
+ "rank": [
+  "your position or level, like a sergeant or captain",
+  "level in a hierarchy"
+ ],
+ "boulder": [
+  "very big rock",
+  "huge round stone on a hillside"
+ ],
+ "policy": [
+  "a plan or set of rules an organisation follows",
+  "a government's official course of action"
+ ],
+ "quarantine": [
+  "keeping sick people apart so a disease doesn't spread",
+  "isolation period after travel during covid"
+ ],
+ "edit": [
+  "change and correct a piece of writing",
+  "cut and fix a video or text before it is published"
+ ],
+ "sculpture": [
+  "a 3d artwork carved from marble or cast in bronze",
+  "art you can walk around, like michelangelo's david"
+ ],
+ "porch": [
+  "covered entrance area outside a front door",
+  "veranda at the front of a house"
+ ],
+ "economy": [
+  "a country's money, jobs and trade",
+  "the system of business and spending in a nation"
+ ],
+ "bolt": [
+  "metal bar that slides to lock a door",
+  "flash of lightning"
+ ],
+ "distance": [
+  "how far apart two places are",
+  "the space between two points, measured in miles or km"
+ ],
+ "verdict": [
+  "guilty or not guilty decision in court",
+  "what the jury decides at the end of a trial"
+ ],
+ "conventional": [
+  "traditional and ordinary, the usual way",
+  "following normal customs, not unusual"
+ ],
+ "bridge": [
+  "structure that carries a road over a river",
+  "you cross it to get over water"
+ ],
+ "penguin": [
+  "black and white bird that can't fly and swims in antarctica",
+  "flightless seabird that waddles on ice"
+ ],
+ "breed": [
+  "particular type of dog or cat, like a labrador",
+  "a variety of animal, like a jersey cow"
+ ],
+ "pathway": [
+  "a route you walk along",
+  "a trail through the park"
+ ],
+ "behavior": [
+  "how someone acts",
+  "the way a child conducts themselves, good or bad"
+ ],
+ "autonomy": [
+  "self-government, being in control of yourself",
+  "the right to make your own decisions without others ruling you"
+ ],
+ "confuse": [
+  "mix things up so nobody understands",
+  "muddle someone's head with too much information"
+ ],
+ "slap": [
+  "strike someone across the face with an open palm",
+  "smack with a flat hand",
+  "hit someone across the face with your open palm",
+  "whack with a flat hand, it stings"
+ ],
+ "ongoing": [
+  "still happening now, not finished",
+  "in progress and not over yet"
+ ],
+ "legitimate": [
+  "legal and allowed by the rules",
+  "genuine and lawful, not fake"
+ ],
+ "stable": [
+  "steady and not likely to wobble or fall over",
+  "firm and secure, not changing"
+ ],
+ "wrap": [
+  "cover a present in paper",
+  "put paper or cloth all around something"
+ ],
+ "overthrow": [
+  "remove a ruler from power by force",
+  "topple a government"
+ ],
+ "radical": [
+  "extreme and wanting big changes",
+  "far from moderate, wanting to change everything"
+ ],
+ "severe": [
+  "very serious and harsh",
+  "extremely bad, like a strong storm"
+ ],
+ "intensive": [
+  "very concentrated and thorough, like a crash course",
+  "involving a lot of effort in a short time"
+ ],
+ "proud": [
+  "feeling pleased about what you or your child achieved",
+  "pleased with yourself after doing well"
+ ],
+ "modern": [
+  "new and up to date, not old fashioned",
+  "of the present time, like recent technology"
+ ],
+ "listen": [
+  "pay attention to sounds with your ears",
+  "pay attention when someone is talking"
+ ],
+ "bother": [
+  "disturb or pester someone",
+  "make the effort, or annoy somebody"
+ ],
+ "expand": [
+  "get bigger and spread out",
+  "make larger, like a balloon filling with air"
+ ],
+ "abandon": [
+  "leave behind and never come back",
+  "desert someone or something"
+ ]
+}

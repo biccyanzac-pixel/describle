@@ -1,6 +1,16 @@
 {
- "epoch": "2026-10-12",
+ "epoch": "2026-10-11",
  "days": [
+  {
+   "word": "download",
+   "banned": [
+    "upload",
+    "online",
+    "software",
+    "podcast",
+    "website"
+   ]
+  },
   {
    "word": "cat",
    "banned": [
@@ -9,76 +19,6 @@
     "pig",
     "tiger",
     "wolf"
-   ]
-  },
-  {
-   "word": "bulb",
-   "banned": [
-    "lamp",
-    "fluorescent",
-    "tube",
-    "flashlight",
-    "onion"
-   ]
-  },
-  {
-   "word": "journalism",
-   "banned": [
-    "journalist",
-    "newspaper",
-    "reporting",
-    "news",
-    "columnist"
-   ]
-  },
-  {
-   "word": "cargo",
-   "banned": [
-    "hauling",
-    "freight",
-    "shipment",
-    "trucking",
-    "payload"
-   ]
-  },
-  {
-   "word": "analogy",
-   "banned": [
-    "compare",
-    "comparison",
-    "similarity",
-    "resemblance",
-    "metaphor"
-   ]
-  },
-  {
-   "word": "greed",
-   "banned": [
-    "greedy",
-    "wealth",
-    "luxury",
-    "rich",
-    "wealthy"
-   ]
-  },
-  {
-   "word": "earn",
-   "banned": [
-    "income",
-    "paid",
-    "realise",
-    "paying",
-    "profit"
-   ]
-  },
-  {
-   "word": "cricket",
-   "banned": [
-    "innings",
-    "bowling",
-    "baseball",
-    "batsman",
-    "fielding"
    ]
   },
   {
@@ -102,53 +42,53 @@
    ]
   },
   {
-   "word": "zinc",
+   "word": "cargo",
    "banned": [
-    "magnesium",
-    "cobalt",
-    "metal",
-    "titanium",
-    "silver"
+    "hauling",
+    "freight",
+    "shipment",
+    "trucking",
+    "payload"
    ]
   },
   {
-   "word": "award",
+   "word": "basketball",
    "banned": [
-    "honour",
-    "honor",
-    "medal",
-    "trophy",
-    "prize"
-   ]
-  },
-  {
-   "word": "volleyball",
-   "banned": [
-    "basketball",
-    "softball",
-    "football",
+    "hoops",
+    "volleyball",
+    "dunk",
     "baseball",
-    "tennis"
+    "football"
    ]
   },
   {
-   "word": "download",
+   "word": "fatigue",
    "banned": [
-    "upload",
-    "online",
-    "software",
-    "podcast",
-    "website"
+    "exhaustion",
+    "weary",
+    "tired",
+    "collapse",
+    "spent"
    ]
   },
   {
-   "word": "curry",
+   "word": "consult",
    "banned": [
-    "cuisine",
-    "cook",
-    "spice",
-    "dressing",
-    "dessert"
+    "discuss",
+    "referral",
+    "advise",
+    "inquiry",
+    "advisory"
+   ]
+  },
+  {
+   "word": "cricket",
+   "banned": [
+    "innings",
+    "bowling",
+    "baseball",
+    "batsman",
+    "fielding"
    ]
   },
   {
@@ -162,93 +102,23 @@
    ]
   },
   {
-   "word": "keeper",
+   "word": "president",
    "banned": [
-    "caretaker",
-    "steward",
-    "handler",
-    "manager",
-    "chamberlain"
-   ]
-  },
-  {
-   "word": "bracelet",
-   "banned": [
-    "jewellery",
-    "jewelry",
-    "necklace",
-    "wrist",
-    "pendant"
-   ]
-  },
-  {
-   "word": "opinion",
-   "banned": [
-    "persuasion",
-    "belief",
-    "sentiment",
-    "speculate",
-    "conjecture"
-   ]
-  },
-  {
-   "word": "exodus",
-   "banned": [
-    "refugee",
-    "trek",
-    "odyssey",
-    "jungle",
-    "covenant"
-   ]
-  },
-  {
-   "word": "practical",
-   "banned": [
-    "virtual",
-    "technique",
-    "practised",
-    "usefulness",
-    "challenging"
-   ]
-  },
-  {
-   "word": "concrete",
-   "banned": [
-    "cement",
-    "stone",
-    "sandstone",
-    "gravel",
-    "mortar"
-   ]
-  },
-  {
-   "word": "livestock",
-   "banned": [
-    "cattle",
-    "cows",
-    "pasture",
-    "farm",
-    "barn"
-   ]
-  },
-  {
-   "word": "presidency",
-   "banned": [
-    "presidential",
     "chairman",
-    "elected",
-    "administrative",
-    "chair"
+    "executive",
+    "administrator",
+    "chair",
+    "commissioner"
    ]
   },
   {
-   "word": "rainfall",
+   "word": "zinc",
    "banned": [
-    "rain",
-    "rainy",
-    "precipitation",
-    "moisture",
-    "humidity"
+    "magnesium",
+    "cobalt",
+    "metal",
+    "titanium",
+    "silver"
    ]
   },
   {
@@ -262,23 +132,153 @@
    ]
   },
   {
-   "word": "talent",
+   "word": "coma",
    "banned": [
-    "gifted",
-    "skill",
-    "ability",
-    "adept",
-    "genius"
+    "unconscious",
+    "sleeping",
+    "stunned",
+    "asleep",
+    "waking"
    ]
   },
   {
-   "word": "aware",
+   "word": "fail",
    "banned": [
-    "mindful",
-    "realize",
-    "consciousness",
-    "know",
-    "conscious"
+    "neglect",
+    "betray",
+    "failure",
+    "unsuccessful",
+    "hopeless"
+   ]
+  },
+  {
+   "word": "curry",
+   "banned": [
+    "cuisine",
+    "cook",
+    "spice",
+    "dressing",
+    "dessert"
+   ]
+  },
+  {
+   "word": "livestock",
+   "banned": [
+    "cattle",
+    "cows",
+    "pasture",
+    "farm",
+    "barn"
+   ]
+  },
+  {
+   "word": "deputy",
+   "banned": [
+    "lieutenant",
+    "officer",
+    "constable",
+    "aide",
+    "caretaker"
+   ]
+  },
+  {
+   "word": "bracelet",
+   "banned": [
+    "jewellery",
+    "jewelry",
+    "necklace",
+    "wrist",
+    "pendant"
+   ]
+  },
+  {
+   "word": "height",
+   "banned": [
+    "stature",
+    "elevation",
+    "tall",
+    "pinnacle",
+    "altitude"
+   ]
+  },
+  {
+   "word": "agriculture",
+   "banned": [
+    "farming",
+    "farmland",
+    "cultivate",
+    "gardening",
+    "plantation"
+   ]
+  },
+  {
+   "word": "compete",
+   "banned": [
+    "vie",
+    "competitiveness",
+    "win",
+    "rival",
+    "competitor"
+   ]
+  },
+  {
+   "word": "concrete",
+   "banned": [
+    "cement",
+    "stone",
+    "sandstone",
+    "gravel",
+    "mortar"
+   ]
+  },
+  {
+   "word": "laptop",
+   "banned": [
+    "notebook",
+    "computer",
+    "dell",
+    "portable",
+    "desktop"
+   ]
+  },
+  {
+   "word": "summer",
+   "banned": [
+    "winter",
+    "autumn",
+    "season",
+    "spring",
+    "sunshine"
+   ]
+  },
+  {
+   "word": "rainfall",
+   "banned": [
+    "rain",
+    "rainy",
+    "precipitation",
+    "moisture",
+    "humidity"
+   ]
+  },
+  {
+   "word": "game",
+   "banned": [
+    "tournament",
+    "contest",
+    "competition",
+    "win",
+    "race"
+   ]
+  },
+  {
+   "word": "coup",
+   "banned": [
+    "takeover",
+    "revolution",
+    "revolt",
+    "dictatorship",
+    "success"
    ]
   }
  ]

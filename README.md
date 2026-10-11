@@ -2,8 +2,8 @@
 
 A daily word game: describe the secret word without using it (or 5 banned words), and a small language model in your browser tries to guess it. Fewer words and fewer attempts score more. Everyone gets the same word each UTC day.
 
-**Status:** Phase 3 (daily schedule + validation) done, waiting for the owner's review. Phase 4 (the game page, scoring, share, leaderboard) is next. **Start with `docs/status.md`.**
-Model bench (also runs on a phone): https://biccyanzac-pixel.github.io/describle/bench/
+**Play:** https://biccyanzac-pixel.github.io/describle/ (live since 11 Oct 2026; also on the [jacob.gg](https://biccyanzac-pixel.github.io/jacob.gg/) hub).
+**Start with `docs/status.md`** (what's built, what's decided, regular upkeep, how to run everything).
 
 ## Layout
 ```
@@ -20,7 +20,7 @@ data/          vocabulary, clue sets, blocklists, curation lists (target-exclude
 bench/         model comparison, iPhone flow and parity checks
 tools/         serve.mjs (local server, port 8082), score.wat + build-wasm.mjs
 docs/          status.md (start here), model.md, vocab.md, schedule.md
-worker/        (Phase 4) leaderboard: Cloudflare Worker + D1, like the other jacob.gg games
+worker/        leaderboard: Cloudflare Worker + D1 (describle-leaderboard), like the other jacob.gg games
 ```
 
 ## Develop
@@ -35,7 +35,8 @@ node tools/serve.mjs                        # http://localhost:8082/bench/
 Rebuilding the data and maintaining the schedule: `docs/status.md`, `docs/schedule.md`.
 
 ## Deploy
-Site: `git subtree split --prefix site -b gh-pages && git push -f origin gh-pages`.
+- Site: `git subtree split --prefix site -b gh-pages && git push -f origin gh-pages`.
+- Worker: `cd worker && npx wrangler deploy` (it bundles `site/js/{daily,ban,scoring}.js` and `site/data/{schedule,vocab}-v1.json`: redeploy when they change).
 
 ## Credits and licences
 - **WordNet 3.0** © Princeton University (WordNet 3.0 licence).

@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { EPOCH, WEEKDAY_POOLS, addDays, weekday } from '../site/js/daily.js';
+import { EPOCH, WEEKDAY_POOLS, addDays, dayNumber, todayKey, weekday } from '../site/js/daily.js';
 import { isVariant, makeBanCheck } from '../site/js/ban.js';
 import { VOCAB_VERSION } from '../site/js/vocab.js';
 
@@ -39,10 +39,12 @@ test('no repeats: no word twice, no variants (dog/dogs), no spelling twins (each
   }
 });
 
-test('every target is a validated, non-excluded vocabulary word with a definition', () => {
+test('every target is a validated, non-excluded vocabulary word with a definition, and no failed playtest', () => {
+  const playtest = read('../data/playtest-results.json');
   for (const d of days) {
     assert.ok(lexicon.has(d.word), d.word);
     assert.ok(validation[d.word]?.pass, `${d.word} failed validation`);
+    assert.ok(playtest[d.word]?.pass !== false, `${d.word} failed its playtest`);
     assert.ok(!exclude.has(d.word), `${d.word} is excluded`);
     assert.ok(d.def && d.def.length > 5, `${d.word} has no definition`);
   }
@@ -66,6 +68,15 @@ test("each day's ban check refuses the target, its banned words and their plural
     for (const w of [d.word, ...d.banned]) assert.ok(!check(`it is a ${w}`).ok, `${w} allowed on ${d.word} day`);
     assert.ok(!check(`some ${d.word}s`).ok || !check(`some ${d.word}es`).ok, `plural of ${d.word}`);
     for (const [w, list] of Object.entries(d.related ?? {})) for (const r of list) assert.ok(!check(r).ok, `${r} (related to ${w})`);
+  }
+});
+
+test('the next 2 weeks are playtested and pass (pipeline/playtest.mjs; playtest 8 weeks ahead)', () => {
+  // This starts failing if nobody playtests upcoming words: run `node pipeline/playtest.mjs --todo 8`.
+  const results = read('../data/playtest-results.json');
+  const from = Math.max(0, dayNumber(todayKey()) - 1);
+  for (const [i, d] of days.slice(from, from + 14).entries()) {
+    assert.ok(results[d.word]?.pass, `${addDays(EPOCH, from + i)}: "${d.word}" has no passing playtest`);
   }
 });
 
