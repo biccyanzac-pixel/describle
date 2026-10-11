@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Describle</title>
+    <meta name="description" content="Describe the daily word without saying it, and an AI in your browser tries to guess it. Fewer words score more. A new word every day." />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%E2%9C%8D%EF%B8%8F%3C/text%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="https://biccyanzac-pixel.github.io/jacob.gg/kit/jgg.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://biccyanzac-pixel.github.io/jacob.gg/kit/jgg.js" defer></script>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="masthead">
+        <a class="wordmark" href="https://biccyanzac-pixel.github.io/jacob.gg/">jacob<span>.gg</span></a>
+      </header>
+
+      <section class="card" id="card">
+        <div class="card-top">
+          <span class="eyebrow" id="daynum">Describle</span>
+          <span class="eyebrow countdown" id="countdown"></span>
+        </div>
+
+        <p class="eyebrow challenge-label" id="level">Today</p>
+        <h1 class="prompt">Get the AI to guess <span class="secret" id="secret">…</span></h1>
+        <p class="pos-note" id="pos-note"></p>
+        <div class="banned">
+          <span class="label">Without using</span>
+          <ul class="chips" id="banned"></ul>
+        </div>
+        <p class="rule-note" id="rule-note">or any form of them (plurals, tenses, words built on them). Describe it in up to 25 words: an AI in your
+          browser guesses. 3 tries a day; fewer words and fewer tries score more.</p>
+
+        <div class="preparing" id="loading">
+          <div class="preparing-row"><span class="spinner-ring" aria-hidden="true"></span><span id="loading-text">Loading the AI…</span></div>
+          <div class="meter"><div class="meter-fill" id="loading-bar"></div></div>
+          <p class="preparing-note" id="loading-note">About 36 MB the first time, then it's saved on this device. You can start typing.</p>
+        </div>
+        <div class="error" id="load-error" role="alert" hidden>
+          <span id="load-error-text"></span>
+          <button class="link-button" id="retry" type="button">Try again</button>
+        </div>
+
+        <ol class="attempt-list" id="history"></ol>
+
+        <form class="play" id="play-form">
+          <p class="eyebrow" id="attempt-label">Attempt 1 of 3</p>
+          <label class="field" id="name-field">
+            <span class="label">Your name (for the leaderboard)</span>
+            <input id="name" type="text" maxlength="20" autocomplete="nickname" placeholder="e.g. jacob" />
+          </label>
+          <p class="playing-as" id="playing-as" hidden></p>
+          <label class="field">
+            <span class="label">Your description</span>
+            <textarea id="text" rows="3" maxlength="400" autocomplete="off" autocapitalize="off" spellcheck="true"
+              placeholder="Describe the word without using it…"></textarea>
+          </label>
+          <span class="counter" id="counter">0 / 25 words</span>
+          <p class="error" id="play-error" role="alert" hidden></p>
+          <button class="submit" id="guess" type="submit" disabled><span id="guess-label">Loading the AI…</span><span class="spinner" aria-hidden="true"></span></button>
+        </form>
+
+        <div class="attempts" id="done" hidden>
+          <p class="eyebrow" id="score-caption">Today's score</p>
+          <p class="score" id="score">0</p>
+          <p class="out-of" id="out-of">out of 100</p>
+          <p class="squares" id="squares"></p>
+          <button class="submit share" id="share" type="button">Share result</button>
+          <p class="fineprint" id="share-done" hidden>Copied to clipboard.</p>
+          <div class="reveal">
+            <p class="label">The word</p>
+            <p class="reveal-word"><strong id="reveal-word"></strong> <span class="pos-note" id="reveal-pos"></span></p>
+            <p class="reveal-def" id="reveal-def"></p>
+            <p class="label">Banned</p>
+            <p class="reveal-banned" id="reveal-banned"></p>
+          </div>
+          <div id="rate"></div>
+          <p class="attempts-done" id="come-back">Come back tomorrow for a new word. They get harder from Monday to Saturday; Sunday is a verb or an adjective.</p>
+        </div>
+      </section>
+
+      <section class="card board" id="board" hidden>
+        <div class="card-top">
+          <h2 class="eyebrow" id="board-title">Today's leaderboard</h2>
+          <span class="eyebrow" id="players"></span>
+        </div>
+        <ol class="rows" id="rows"></ol>
+        <p class="board-empty" id="board-empty" hidden>Nobody has finished yet today. Be the first.</p>
+        <p class="board-note" id="board-note" hidden></p>
+      </section>
+
+      <section class="card archive" id="archive">
+        <div class="card-top">
+          <h2 class="eyebrow">Archive: play a past day</h2>
+        </div>
+        <p class="archive-note">Replays go on a separate "played later" board and never change a day's original results.</p>
+        <div class="archive-picker">
+          <button type="button" class="archive-browse" id="archive-browse">Browse archive</button>
+        </div>
+        <ul class="archive-list" id="archive-list" hidden></ul>
+      </section>
+
+      <footer class="footer">
+        <p>A new word every day at midnight UTC, the same for everyone. Ties go to whoever finished first.</p>
+        <p>The AI (all-MiniLM-L6-v2) runs in your browser: your descriptions are checked by the leaderboard but not stored.</p>
+        <details class="credits">
+          <summary>How it works &amp; credits</summary>
+          <p>Your description is turned into a vector by a small language model, all-MiniLM-L6-v2 (Apache-2.0), running on
+            ONNX Runtime Web (MIT). It's compared with the definitions of 15,000 common words from WordNet 3.0
+            (© Princeton University, <a href="https://wordnet.princeton.edu/license-and-commercial-use">WordNet 3.0 licence</a>),
+            and the closest word is the guess.</p>
+          <p>Word frequencies: <a href="https://github.com/rspeer/wordfreq">wordfreq</a> data (CC BY-SA 4.0); the word list
+            derived from it (<a href="data/vocab-v1.json">vocab-v1.json</a>) is shared under CC BY-SA 4.0.
+            Blocklist: LDNOOBW (CC BY 4.0). Stemming: stemmer (MIT). Tokenizer: @huggingface/tokenizers (Apache-2.0).</p>
+          <p>Source: <a href="https://github.com/biccyanzac-pixel/describle">github.com/biccyanzac-pixel/describle</a> ·
+            <a href="bench/">Model check for your device</a></p>
+        </details>
+      </footer>
+    </main>
+
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>

@@ -2,9 +2,8 @@
 // the leaderboard worker, so the day, puzzle number and target can never disagree between them.
 // The day is the UTC date: everyone gets the same word, and it changes at 00:00 UTC.
 
-// Puzzle #1. Provisional until launch (Phase 4): if the launch date moves, regenerate the schedule with the new
-// epoch (pipeline/schedule.mjs --epoch). Once live, NEVER change it: it renumbers every puzzle.
-export const EPOCH = '2026-10-12';
+// Puzzle #1: launch day (Sunday 11 Oct 2026). NEVER change it: it renumbers every puzzle and moves every word.
+export const EPOCH = '2026-10-11';
 
 /** UTC day key YYYY-MM-DD. */
 export function todayKey(now = new Date()) {
