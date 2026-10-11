@@ -50,7 +50,7 @@ Last updated: 11 Oct 2026 (launch day).
 ```
 npm install && (cd worker && npm install)
 python -m venv .venv && .venv/Scripts/pip install nltk wordfreq numpy safetensors huggingface_hub pytest
-npm test                                     # 45 tests (~1 min: some start headless Chrome)
+npm test                                     # 43 tests (~1 min: some start headless Chrome)
 .venv/Scripts/python -m pytest               # vocabulary filters
 node tools/serve.mjs                         # http://localhost:8082/  (?api=http://127.0.0.1:8812 for a local worker, ?hub=off)
 cd worker && npm run db:init:local && npm run dev:local     # local worker on 8812; then: npm test (API e2e)
@@ -58,6 +58,7 @@ node tools/e2e-ui.mjs                        # plays today in headless Chrome, p
 node bench/phone-flow.mjs webkit             # the phone test's 3 visits; BASE=<live url>, SIMULATE_IOS=1, BLOCK_HUB=1
 node bench/parity.mjs webkit                 # browser vectors == shipped vectors (must be 1.000000)
 node pipeline/try.mjs <word> "a description" # what the AI guesses
+node tools/live-check.mjs chrome|webkit      # the live game loads, AI and leaderboard work (doesn't play)
 ```
 **Deploying:**
 - **Site:** `git subtree split --prefix site -b gh-pages && git push -f origin gh-pages`.
