@@ -44,7 +44,7 @@ export async function session(fresh = false) {
 
 export function playerId() { return (memSession || readSession())?.playerId ?? null; }
 // Describle's name, else the one used in any other jacob.gg game (kit/jgg.js); saving shares it back.
-export function savedName() { try { return localStorage.getItem(NAME_KEY) || window.JGG?.name() || ''; } catch { return ''; } }
+export function savedName() { try { return window.JGG?.name() || localStorage.getItem(NAME_KEY) || ''; } catch { return ''; } }
 export function saveName(n) { window.JGG?.setName(n); try { localStorage.setItem(NAME_KEY, n); } catch { /* ignore */ } }
 
 /**
