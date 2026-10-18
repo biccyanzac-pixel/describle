@@ -49,10 +49,12 @@ export function saveName(n) { window.JGG?.setName(n); try { localStorage.setItem
 
 /**
  * Record one attempt. The description is sent so the server can check it against the day's ban rules and the word
- * limit; it isn't stored. `top` is the model's top 5 (the server works out the rank and the score itself).
+ * limit; it isn't stored. `top` is the model's top 5 and `place` where the secret word came among all the words
+ * (the server works out the rank and the score itself). `board`: 'day', 'replay' or 'late'; attempt 0 on a replay
+ * board starts a new run.
  */
-export async function submitAttempt({ day, attempt, text, top, name }) {
-  const body = { day, attempt, text, top, name };
+export async function submitAttempt({ day, board, attempt, text, top, place, name }) {
+  const body = { day, board, attempt, text, top, place, name };
   let s = await session();
   try { return await call('/api/attempt', { ...s, ...body }); }
   catch (e) {
@@ -62,9 +64,10 @@ export async function submitAttempt({ day, attempt, text, top, name }) {
   }
 }
 
-export function board(day, late = false) {
+/** A day's board: 'day' (first goes on the day), 'replay' (more goes on the day) or 'late' (played later). */
+export function board(day, which = 'day') {
   const pid = playerId();
-  return call(`/api/leaderboard?day=${day}${late ? '&late=1' : ''}${pid ? '&playerId=' + encodeURIComponent(pid) : ''}`);
+  return call(`/api/leaderboard?day=${day}&board=${which}${pid ? '&playerId=' + encodeURIComponent(pid) : ''}`);
 }
 
 export function days(from, to) { return call(`/api/days?from=${from}&to=${to}`); }
