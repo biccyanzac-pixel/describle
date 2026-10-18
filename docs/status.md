@@ -2,7 +2,7 @@
 
 **Read this first**, then `CLAUDE.md` (rules), then the docs for the part you're changing. House rules shared by all jacob.gg games: `../jacob.gg/PLAYBOOK.md` (the `daily-games` skill points there).
 
-Last updated: 11 Oct 2026 (launch day).
+Last updated: 18 Oct 2026 (replays, places, rules 2 from 20 Oct).
 
 ## Where it stands: live
 - **Play:** https://biccyanzac-pixel.github.io/describle/ (also on the jacob.gg hub). Puzzle #1 was Sunday 11 Oct 2026.
@@ -20,12 +20,17 @@ Last updated: 11 Oct 2026 (launch day).
 ## The game (as built)
 - **The puzzle:** the player sees the day's word and its 5 banned words. They describe the word in at most 25 words, and the ban check refuses the word, banned words and their forms live (`site/js/ban.js`).
 - **The guess:** the AI in the browser embeds the description (`embed.js`) and shows its top 5 with bars (`vocab.guess`). It never guesses a word the description itself used. The player wins if the top guess is the word or a form of it; "Close! #n" if it's in the top 5.
-- **Attempts:** 3 a day. Score for the winning attempt = 100 − 25 per earlier attempt − 3 per word over 5, never below 10; 0 if not guessed (`scoring.js`). The share text looks like "✍️ Describle #1 — guessed in 9 words, attempt 1 (88/100)" with 🟩🟨⬛ squares and a 🔥 streak.
-- **After a game:** a results screen with the reveal (definition, banned words), the jacob.gg rating box and a countdown.
-- **Leaderboard:** today's board, plus an archive of past days played on a separate "played later" board. Name once, then every attempt is submitted automatically.
+- **Place:** every attempt also shows where the word came among all 15,000 words ("#37 of 15,000", `vocab.place`).
+- **Scoring depends on the puzzle day** (`rulesFor` in `scoring.js`), so past days never change:
+  - **Rules 1, puzzles before `V2_FROM` (20 Oct 2026):** 3 attempts, the day ends at the first #1. Score for the winning attempt = 100 − 25 per earlier attempt − 3 per word over 5, never below 10; 0 if not guessed. Share text: "✍️ Describle #1 — guessed in 9 words, attempt 1 (88/100)".
+  - **Rules 2, from `V2_FROM`** (owner, 18 Oct): all 3 attempts are always played, even after a #1. Each scores by place (#1 100, #2 70, #3 55, #4 45, #5 40, #6–10 25, #11–25 15, #26–100 5) less 2.5% per word over 5; the day's score is the average of the 3, to one decimal. Share text: "✍️ Describle #12 — 62.7/100, best #1 in 4 words".
+  - Squares: 🟩 #1, 🟨 #2–5, 🟧 #6–100 (rules 2 only), ⬛ below. 🔥 streak = days with a #1 on the first go.
+- **After a game:** a results screen with the reveal (definition, banned words), **Play again**, the jacob.gg rating box and a countdown.
+- **Leaderboards, three per day** (`is_late` in the database): the first go on the day (0), more goes on the day, "replays" (2), and goes after the day, "played later" (1). Replays and played-later take any number of goes; a player's best go is their row, shown as "best of N". The board card has tabs for the day's two boards. Name once, then every attempt is submitted automatically.
 - **Robustness:** if the AI fails to load, the page clears the model cache and reloads once, then shows the error with a retry button. The model comes from the Hugging Face Hub, falling back to `site/models/`.
-- **What the worker checks** (`worker/src/index.js`): the day, the attempt order, the 1–25 word limit, the day's ban rules and that the top 5 are vocabulary words. It works out the rank and the score itself.
-  - **Trusted from the browser:** the top 5. A Worker can't run the model, so this is the playbook's "consistency check" model, like Yogle and Pointle.
+- **What the worker checks** (`worker/src/index.js`): the day, the board, the attempt order within each go, the 1–25 word limit, the day's ban rules, that the top 5 are vocabulary words and that the place agrees with them. It works out the rank and the score itself.
+  - **Trusted from the browser:** the top 5 and the place. A Worker can't run the model, so this is the playbook's "consistency check" model, like Yogle and Pointle.
+  - **Schema changes** go in `worker/migrations/` (run on the live database before deploying the worker that needs them); `schema.sql` is the full current shape for fresh databases. `0002_replays.sql` added runs and places.
   - **Never stored:** the description text.
 
 ## What needs doing regularly
@@ -42,15 +47,14 @@ Last updated: 11 Oct 2026 (launch day).
 - **Free:** no accounts, no analytics. Ask the owner before anything paid.
 
 ## Ideas not done
-- **Show the top 5 for a failed day's correct word:** e.g. "Your closest attempt had it at #4".
-- **Practice mode** on random past words. It must stay off the leaderboard.
+- **Practice mode** on random past words. It must stay off the leaderboard (replays and the archive cover most of it).
 - **More playtesters:** ask friends to write descriptions for `data/playtest.json` (it's plain JSON).
 
 ## How to run things
 ```
 npm install && (cd worker && npm install)
 python -m venv .venv && .venv/Scripts/pip install nltk wordfreq numpy safetensors huggingface_hub pytest
-npm test                                     # 43 tests (~1 min: some start headless Chrome)
+npm test                                     # 48 tests (~1 min: some start headless Chrome)
 .venv/Scripts/python -m pytest               # vocabulary filters
 node tools/serve.mjs                         # http://localhost:8082/  (?api=http://127.0.0.1:8812 for a local worker, ?hub=off)
 cd worker && npm run db:init:local && npm run dev:local     # local worker on 8812; then: npm test (API e2e)

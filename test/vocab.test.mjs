@@ -61,3 +61,20 @@ test('the browser path reproduces the tuner on every clue set', { skip: !built &
     assert.deepEqual({ n: clues.length, top1, top5 }, { n: expected.n, top1: expected.top1, top5: expected.top5 }, set);
   }
 });
+
+test("the word's place among all the words agrees with the top 5", { skip: !built && 'run pipeline/build.mjs' }, async () => {
+  const V = await makeVocab(meta, bin);
+  // A query that is some word's own sense vector: a spread of places for other targets.
+  const q = Float32Array.from(bin.subarray(V.senseRow(V.index.get('apple'), 0) * meta.dim, (V.senseRow(V.index.get('apple'), 0) + 1) * meta.dim), (x) => x / 127);
+  const { scores, top } = V.guess(q, 5);
+  top.forEach((t, i) => assert.equal(V.place(scores, t.word), i + 1, t.word));
+  for (const w of ['democracy', 'run', 'blue']) {
+    const p = V.place(scores, w);
+    assert.ok(p > 5 && p <= meta.words.length, `${w}: ${p}`);
+    // exactly the words above it score higher (or tie and come first)
+    const s = Math.max(...meta.words.flatMap((x, i) => (isVariant(x, w, meta.irregular) ? [scores[i]] : [])));
+    const above = [...scores].filter((x) => x > s).length, level = [...scores].filter((x) => x >= s).length;
+    assert.ok(p >= above + 1 && p <= level, `${w}: ${p} not in ${above + 1}..${level}`);
+  }
+  assert.equal(V.place(scores, 'notaword-xyz'), 0);
+});

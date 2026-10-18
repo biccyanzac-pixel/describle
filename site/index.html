@@ -69,6 +69,10 @@
           <p class="squares" id="squares"></p>
           <button class="submit share" id="share" type="button">Share result</button>
           <p class="fineprint" id="share-done" hidden>Copied to clipboard.</p>
+          <div class="again">
+            <button class="archive-browse" id="again" type="button">Play again</button>
+            <p class="fineprint" id="again-note"></p>
+          </div>
           <div class="reveal">
             <p class="label">The word</p>
             <p class="reveal-word"><strong id="reveal-word"></strong> <span class="pos-note" id="reveal-pos"></span></p>
@@ -86,6 +90,7 @@
           <h2 class="eyebrow" id="board-title">Today's leaderboard</h2>
           <span class="eyebrow" id="players"></span>
         </div>
+        <div class="board-tabs" id="board-tabs" role="group" aria-label="Which board"></div>
         <ol class="rows" id="rows"></ol>
         <p class="board-empty" id="board-empty" hidden>Nobody has finished yet today. Be the first.</p>
         <p class="board-note" id="board-note" hidden></p>
@@ -95,7 +100,8 @@
         <div class="card-top">
           <h2 class="eyebrow">Archive: play a past day</h2>
         </div>
-        <p class="archive-note">Replays go on a separate "played later" board and never change a day's original results.</p>
+        <p class="archive-note">Play any day as often as you like. Goes at a past day go on a separate "played later" board,
+          and more goes at today on a replay board: they never change a day's first results.</p>
         <div class="archive-picker">
           <button type="button" class="archive-browse" id="archive-browse">Browse archive</button>
         </div>

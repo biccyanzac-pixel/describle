@@ -1,10 +1,11 @@
-// Describle UI: today's word and banned words -> up to 3 descriptions -> the AI's top 5 each time -> score, share,
-// leaderboard. Archive replays of past days. The AI (MiniLM on ONNX Runtime Web) loads in the background on page open.
+// Describle UI: today's word and banned words -> up to 3 descriptions -> the AI's top 5 and the word's place each time
+// -> score, share, leaderboard. Any day can be played again ("Play again"): more goes at today go on the replay board,
+// goes at a past day on the played-later board. The AI (MiniLM on ONNX Runtime Web) loads in the background on page open.
 import * as api from './api.js';
 import { EPOCH, addDays, dayNumber, entryFor, msUntilNextUtcDay, todayKey, weekday } from './daily.js';
 import { isVariant, makeBanCheck } from './ban.js';
 import { clearModelCaches, loadEmbedder } from './embed.js';
-import { MAX_ATTEMPTS, MAX_WORDS, MAX_SCORE, attemptSquare, dayResult, shareText, wordCount } from './scoring.js';
+import { MAX_ATTEMPTS, MAX_WORDS, MAX_SCORE, attemptPoints, dayResult, rulesFor, shareText, squareFor, wordCount } from './scoring.js';
 import * as store from './storage.js';
 import { loadVocab, loadVocabMeta } from './vocab.js';
 
@@ -13,11 +14,17 @@ const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Frida
 const LEVELS = ['Sunday special', 'easiest', 'easy', 'medium', 'harder', 'hard', 'hardest'];
 const POS = { n: 'a noun', v: 'a verb', a: 'an adjective' };
 const RELOAD_FLAG = 'describle:reloaded-after-load-error';
+const RULE_NOTES = {
+  1: 'or any form of them (plurals, tenses, words built on them). Describe it in up to 25 words: an AI in your browser guesses. 3 tries a day; fewer words and fewer tries score more.',
+  2: 'or any form of them (plurals, tenses, words built on them). Describe it in up to 25 words: an AI in your browser guesses. You get 3 tries and all 3 count: each scores by where the AI puts the word (#1 = 100, #2 = 70 … down to #100) and how few words you use, and your score is the average.',
+};
 
 let schedule = null;   // site/data/schedule-v1.json
 let meta = null;       // site/data/vocab-v1.json (words, irregular forms)
 let ai = null;         // { embedder, vocab } once loaded
-let mode = { day: todayKey(), late: false };
+// board: 'day' (the first go, on the day), 'replay' (more goes on the day) or 'late' (a past day, played later).
+let mode = { day: todayKey(), board: 'day' };
+let boardView = 'day'; // which of the day's boards the leaderboard card shows
 let busy = false;
 
 function el(tag, props = {}, ...children) {
@@ -34,8 +41,13 @@ function el(tag, props = {}, ...children) {
 }
 const show = (id, on = true) => { $(id).hidden = !on; };
 const pad = (n) => String(n).padStart(2, '0');
+const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 const entry = () => entryFor(mode.day, schedule);
-const attempts = () => store.attempts(mode.day, mode.late);
+const attempts = () => store.attempts(mode.day, mode.board);
+const result = () => dayResult(attempts(), mode.day);
+const rules = () => rulesFor(mode.day);
+const isToday = () => mode.day === todayKey();
+const vocabSize = () => (meta?.words.length ?? 15000).toLocaleString('en-GB');
 
 // --- loading the AI -----------------------------------------------------------------------------------
 
@@ -76,16 +88,23 @@ async function loadAI() {
 
 // --- rendering ------------------------------------------------------------------------------------
 
+function goLabel() {
+  if (mode.board === 'day') return '';
+  const n = store.runs(mode.day, mode.board).length || 1;
+  return mode.board === 'late' ? ` · ${mode.day} (played later${n > 1 ? `, go ${n}` : ''})` : ` · replay${n > 1 ? ` ${n}` : ''}`;
+}
+
 function render() {
   const e = entry();
   if (!e) { $('secret').textContent = '…'; return; }
-  const { day, late } = mode;
-  $('daynum').textContent = `Describle #${e.number}${late ? ` · ${day} (played later)` : ''}`;
+  const { day } = mode;
+  $('daynum').textContent = `Describle #${e.number}${goLabel()}`;
   if (window.JGG) $('level').replaceChildren(JGG.levelChip(day));
   else $('level').textContent = `${WEEKDAYS[weekday(day)]} · ${LEVELS[weekday(day)]}`;
   $('secret').textContent = e.word;
   $('pos-note').textContent = `${POS[e.pos] ?? ''}${weekday(day) === 0 ? ' · Sunday special: an action or a quality' : ''}`;
   $('banned').replaceChildren(...e.banned.map((b) => el('li', { class: 'chip banned-chip', text: b })));
+  $('rule-note').textContent = RULE_NOTES[rules()];
   renderHistory();
   renderPlay();
   renderDone();
@@ -104,13 +123,19 @@ function bars(top, target) {
   }));
 }
 
+/** Where the word came, e.g. "#37 of 15,000" (attempts saved before places existed have none). */
+const placeText = (a) => (a.place ? `#${a.place.toLocaleString('en-GB')} of ${vocabSize()}` : '');
+
 function verdict(a, target) {
-  if (a.rank === 1) {
-    const exact = a.top[0].word === target;
-    return { cls: 'good', text: exact ? 'Got it!' : `Got it! ("${a.top[0].word}" counts)` };
+  const counts = a.top[0].word === target ? '' : ` ("${a.top[0].word}" counts)`;
+  if (rules() === 2) {
+    const pts = ` · ${plural(attemptPoints(a.place, a.words), 'pt')}`;
+    if (a.place === 1) return { cls: 'good', text: `Got it!${counts}${pts}` };
+    return { cls: a.place && a.place <= 100 ? 'ok' : 'bad', text: `${placeText(a)}${pts}` };
   }
+  if (a.rank === 1) return { cls: 'good', text: `Got it!${counts}` };
   if (a.rank >= 2) return { cls: 'ok', text: `Close! It was #${a.rank}` };
-  return { cls: 'bad', text: 'Not in the top 5' };
+  return { cls: 'bad', text: a.place ? `Not in the top 5 (${placeText(a)})` : 'Not in the top 5' };
 }
 
 function renderHistory() {
@@ -119,7 +144,7 @@ function renderHistory() {
     const v = verdict(a, e.word);
     return el('li', { class: 'attempt-row' },
       el('div', { class: 'attempt-head' },
-        el('span', { class: 'attempt-label', text: `Attempt ${i + 1} · ${a.words} word${a.words === 1 ? '' : 's'}` }),
+        el('span', { class: 'attempt-label', text: `Attempt ${i + 1} · ${plural(a.words, 'word')}` }),
         el('span', { class: `attempt-verdict ${v.cls}`, text: v.text })),
       el('p', { class: 'attempt-answer', text: `“${a.text}”` }),
       bars(a.top, e.word));
@@ -127,11 +152,13 @@ function renderHistory() {
 }
 
 function renderPlay() {
-  const r = dayResult(attempts());
+  const r = result();
   const finished = r.finished;
   show('play-form', !finished && !!entry());
   if (finished) return;
-  $('attempt-label').textContent = `Attempt ${r.used + 1} of ${MAX_ATTEMPTS}${r.used ? ' · try a different angle' : ''}`;
+  const hint = !r.used ? (rules() === 2 ? ' · all 3 count' : '')
+    : rules() === 2 && r.solved ? ' · got it: now try fewer words' : ' · try a different angle';
+  $('attempt-label').textContent = `Attempt ${r.used + 1} of ${MAX_ATTEMPTS}${hint}`;
   const name = api.savedName();
   const needName = api.enabled() && !name;
   show('name-field', needName);
@@ -184,22 +211,30 @@ function banCheck() {
 
 function renderDone() {
   const list = attempts();
-  const r = dayResult(list);
+  const r = result();
   show('done', r.finished);
   if (!r.finished) return;
   const e = entry();
-  const { day, late } = mode;
-  $('score-caption').textContent = late ? `Your replay of ${day}` : "Today's score";
+  const { day, board } = mode;
+  $('score-caption').textContent = board === 'late' ? `Your replay of ${day}` : board === 'replay' ? "Your replay of today's word" : "Today's score";
   $('score').textContent = r.score;
-  $('score').className = `score${r.solved ? ' good' : ' bad'}`;
-  $('out-of').textContent = r.solved ? `out of ${MAX_SCORE} · guessed on attempt ${r.attempt} in ${r.words} word${r.words === 1 ? '' : 's'}` : `out of ${MAX_SCORE} · not guessed`;
-  $('squares').textContent = list.slice(0, r.used).map((a) => attemptSquare(a.rank)).join(' ');
+  $('score').className = `score${r.score > 0 ? ' good' : ' bad'}`;
+  if (r.rules === 2) {
+    const best = r.best?.points > 0 ? ` · best: #${r.best.place} in ${plural(r.best.words, 'word')}` : '';
+    $('out-of').textContent = `out of ${MAX_SCORE} · the average of your 3 attempts${best}`;
+  } else {
+    $('out-of').textContent = r.solved ? `out of ${MAX_SCORE} · guessed on attempt ${r.attempt} in ${plural(r.words, 'word')}` : `out of ${MAX_SCORE} · not guessed`;
+  }
+  $('squares').textContent = list.slice(0, r.used).map((a) => squareFor(a, day)).join(' ');
   $('reveal-word').textContent = e.word;
   $('reveal-pos').textContent = POS[e.pos] ?? '';
   $('reveal-def').textContent = e.def;
   $('reveal-banned').textContent = e.banned.join(', ');
   show('share-done', false);
-  if (!late && window.JGG?.rate) window.JGG.rate({ game: 'describle', day, mount: $('rate') });
+  $('again-note').textContent = board === 'late' ? 'It goes on the "played later" board.'
+    : `It goes on today's replay board; your first go stays on the main one.`;
+  if (board !== 'late' && window.JGG?.rate) window.JGG.rate({ game: 'describle', day, mount: $('rate') });
+  else $('rate').replaceChildren();
 }
 
 // --- playing --------------------------------------------------------------------------------------
@@ -222,11 +257,13 @@ async function guess() {
   try {
     const q = await ai.embedder.embed(text);
     // The AI never guesses a word the description itself uses (docs/vocab.md, "Mentioned words").
-    const top = ai.vocab.guess(q, 5, { mentioned: text }).top.map((t) => ({ word: t.word, score: +t.score.toFixed(4) }));
+    const g = ai.vocab.guess(q, 5, { mentioned: text });
+    const top = g.top.map((t) => ({ word: t.word, score: +t.score.toFixed(4) }));
     const rank = top.findIndex((t) => isVariant(t.word, e.word, meta.irregular)) + 1;
+    const place = ai.vocab.place(g.scores, e.word) || null;
     const index = attempts().length;
-    store.addAttempt(mode.day, mode.late, { text, words, rank, top });
-    submit(index, text, top);
+    store.addAttempt(mode.day, mode.board, { text, words, rank, place, top });
+    submit(index, text, top, place);
     $('text').value = '';
   } catch (err) {
     console.error(err);
@@ -236,28 +273,41 @@ async function guess() {
     busy = false;
     $('guess').classList.remove('busy');
   }
+  $('daynum').textContent = `Describle #${e.number}${goLabel()}`;
   renderHistory();
   renderPlay();
   renderDone();
   const rows = $('history').children;
   rows[rows.length - 1]?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  if (dayResult(attempts()).finished) $('done').scrollIntoView({ block: 'start', behavior: 'smooth' });
+  if (result().finished) $('done').scrollIntoView({ block: 'start', behavior: 'smooth' });
 }
 
-function submit(attempt, text, top) {
+function submit(attempt, text, top, place) {
   if (!api.enabled()) return;
-  const { day } = mode;
-  api.submitAttempt({ day, attempt, text, top: top.map((t) => t.word), name: api.savedName() })
-    .then(() => renderBoard())
+  const { day, board } = mode;
+  api.submitAttempt({ day, board, attempt, text, top: top.map((t) => t.word), place, name: api.savedName() })
+    .then(() => { boardView = board; renderBoard(); })
     .catch((e) => { $('board-note').textContent = `Couldn't save to the leaderboard: ${e.message}`; show('board-note', true); });
 }
 
-function solvedOn(d) { return dayResult(store.attempts(d, false)).solved; }
+/** Another go at the same day: today's go on the replay board, a past day's on the played-later board. */
+function playAgain() {
+  const board = mode.board === 'late' ? 'late' : 'replay';
+  const last = store.attempts(mode.day, board);
+  if (last.length && dayResult(last, mode.day).finished) store.newRun(mode.day, board);
+  mode = { day: mode.day, board };
+  boardView = board;
+  render();
+  $('card').scrollIntoView({ block: 'start', behavior: 'smooth' });
+  $('text').focus({ preventScroll: true });
+}
+
+function solvedOn(d) { return dayResult(store.attempts(d, 'day'), d).solved; }
 
 async function share() {
   const e = entry();
-  const text = shareText({ number: e.number, attempts: attempts(), late: mode.late,
-    streak: mode.late ? 0 : store.streak(todayKey(), addDays, solvedOn) });
+  const text = shareText({ number: e.number, attempts: attempts(), late: mode.board !== 'day', day: mode.day,
+    streak: mode.board !== 'day' ? 0 : store.streak(todayKey(), addDays, solvedOn) });
   try {
     if (navigator.share && matchMedia('(pointer: coarse)').matches) { await navigator.share({ text }); return; }
     await navigator.clipboard.writeText(text);
@@ -269,16 +319,40 @@ async function share() {
 
 // --- leaderboard ----------------------------------------------------------------------------------
 
+/** The two boards a day has: [main, other]. */
+const dayBoards = () => (isToday() ? [['day', 'Today'], ['replay', 'Replays']] : [['day', 'On the day'], ['late', 'Played later']]);
+
+function boardTitle(view) {
+  if (isToday()) return view === 'replay' ? "Today's replays (not first goes)" : "Today's leaderboard";
+  return view === 'late' ? `Played later: ${mode.day}` : `On the day: ${mode.day}`;
+}
+
+function rowSub(r) {
+  const two = rulesFor(mode.day) === 2;
+  const squares = r.ranks.map((x) => squareFor(two ? { place: x } : { rank: x }, mode.day)).join('');
+  const what = two ? (r.ranks.length ? ` · ${r.ranks.map((p) => `#${p}`).join(' ')}` : '') + (r.finished ? '' : ' · playing')
+    : r.solved ? ` · ${plural(r.words, 'word')}` : r.finished ? ' · not guessed' : ' · playing';
+  return `${squares}${what}${r.runs > 1 ? ` · best of ${r.runs}` : ''}`;
+}
+
+let boardSeq = 0;
 async function renderBoard() {
   if (!api.enabled()) { show('board', false); return; }
-  const { day, late } = mode;
+  const boards = dayBoards();
+  if (!boards.some(([b]) => b === boardView)) boardView = boards[0][0];
+  const view = boardView, seq = ++boardSeq;
   show('board', true);
-  $('board-title').textContent = late ? `Played later: ${day}` : "Today's leaderboard";
+  $('board-title').textContent = boardTitle(view);
+  $('board-tabs').replaceChildren(...boards.map(([b, label]) => el('button', {
+    type: 'button', class: `board-tab${b === view ? ' on' : ''}`, 'aria-pressed': String(b === view), text: label,
+    onclick: () => { boardView = b; renderBoard(); },
+  })));
   let b;
-  try { b = await api.board(day, late); }
-  catch (e) { $('board-note').textContent = `Leaderboard unavailable: ${e.message}`; show('board-note', true); return; }
+  try { b = await api.board(mode.day, view); }
+  catch (e) { if (seq === boardSeq) { $('board-note').textContent = `Leaderboard unavailable: ${e.message}`; show('board-note', true); } return; }
+  if (seq !== boardSeq) return; // a newer render is on its way
   show('board-note', false);
-  $('players').textContent = b.players ? `${b.players} player${b.players === 1 ? '' : 's'}` : '';
+  $('players').textContent = b.players ? plural(b.players, 'player') : '';
   const rows = [...b.top];
   if (b.you) rows.push(null, b.you);
   $('rows').replaceChildren(...rows.map((r) => r === null ? el('li', { class: 'row-gap', text: '···' })
@@ -286,14 +360,20 @@ async function renderBoard() {
       el('span', { class: 'row-rank', text: `${r.rank}` }),
       el('div', { class: 'row-main' },
         el('div', { class: 'row-name', text: r.name }),
-        el('div', { class: 'row-sub' },
-          el('span', { class: 'row-emoji', text: r.ranks.map(attemptSquare).join('') }),
-          r.solved ? ` · ${r.words} word${r.words === 1 ? '' : 's'}` : r.finished ? ' · not guessed' : ' · playing')),
+        el('div', { class: 'row-sub' }, el('span', { class: 'row-emoji', text: rowSub(r) }))),
       el('span', { class: 'row-score', text: `${r.score}` }))));
+  $('board-empty').textContent = view === 'day' ? (isToday() ? 'Nobody has played yet today. Be the first.' : 'Nobody played on the day.')
+    : view === 'replay' ? 'No replays yet: finish your go, then "Play again".' : 'Nobody has played this day later yet.';
   show('board-empty', !b.top.length);
 }
 
 // --- archive --------------------------------------------------------------------------------------
+
+/** Your best finished go at a day on a replay board, or null. */
+function bestRun(d, board) {
+  const scores = store.runs(d, board).map((r) => dayResult(r, d)).filter((r) => r.finished).map((r) => r.score);
+  return scores.length ? Math.max(...scores) : null;
+}
 
 async function browseArchive() {
   const list = $('archive-list');
@@ -305,8 +385,8 @@ async function browseArchive() {
   catch { /* the list works without counts */ }
   list.replaceChildren(...(items.length ? items.map((d) => {
     const s = summary[d];
-    const onDay = dayResult(store.attempts(d, false)), later = dayResult(store.attempts(d, true));
-    const mine = onDay.finished ? onDay.score : later.finished ? later.score : null;
+    const onDay = dayResult(store.attempts(d, 'day'), d);
+    const mine = onDay.finished ? onDay.score : bestRun(d, 'late');
     return el('li', {}, el('button', { class: 'archive-list-item', type: 'button', onclick: () => openArchive(d) },
       el('span', { class: 'archive-list-day', text: `Describle #${dayNumber(d)} · ${WEEKDAYS[weekday(d)]} ${d}` }),
       el('span', { class: 'archive-list-prompt', text: [
@@ -317,8 +397,9 @@ async function browseArchive() {
 }
 
 function openArchive(d) {
-  // Finished on the day: show that result. Otherwise it's a replay ("played later"), even if it was started then.
-  mode = dayResult(store.attempts(d, false)).finished ? { day: d, late: false } : { day: d, late: true };
+  // Finished on the day: show that result ("Play again" for more). Otherwise it's a go on the played-later board.
+  mode = dayResult(store.attempts(d, 'day'), d).finished ? { day: d, board: 'day' } : { day: d, board: 'late' };
+  boardView = mode.board;
   $('archive-list').hidden = true;
   checkCache = null;
   render();
@@ -330,13 +411,17 @@ function openArchive(d) {
 function tickCountdown() {
   const s = Math.floor(msUntilNextUtcDay() / 1000);
   $('countdown').textContent = `Next in ${pad(Math.floor(s / 3600))}:${pad(Math.floor(s / 60) % 60)}:${pad(s % 60)}`;
-  if (!mode.late && mode.day !== todayKey() && !busy && schedule) { mode = { day: todayKey(), late: false }; checkCache = null; render(); }
+  // A new UTC day: switch to it, unless this is a past day being played later (or a guess is being made).
+  if (mode.board !== 'late' && mode.day !== todayKey() && !busy && schedule) {
+    mode = { day: todayKey(), board: 'day' }; boardView = 'day'; checkCache = null; render();
+  }
 }
 
 $('play-form').addEventListener('submit', (e) => { e.preventDefault(); guess(); });
 $('text').addEventListener('input', updateCounter);
 $('text').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); guess(); } });
 $('share').addEventListener('click', share);
+$('again').addEventListener('click', playAgain);
 $('archive-browse').addEventListener('click', browseArchive);
 $('retry').addEventListener('click', async () => {
   await clearModelCaches();

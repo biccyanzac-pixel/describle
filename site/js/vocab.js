@@ -5,7 +5,7 @@
 // Changing the vocabulary or the vectors changes what the model guesses: never do it to a live or past day.
 import { createScorer, fetchCached } from './embed.js';
 import { combine, topIndices, senseBiasFrom } from './guess.js';
-import { forms, tokenize } from './ban.js';
+import { forms, isVariant, tokenize } from './ban.js';
 import { stemmer } from '../vendor/stemmer/stemmer.js';
 
 export const VOCAB_VERSION = 1;
@@ -57,8 +57,28 @@ export async function makeVocab(meta, vectors) {
     }
     return hit;
   }
+  const variants = new Map(); // target -> indices of the words that count as it (isVariant)
+  function variantIds(target) {
+    if (!variants.has(target)) variants.set(target, meta.words.flatMap((w, i) => (isVariant(w, target, irregular) ? [i] : [])));
+    return variants.get(target);
+  }
   return {
     meta, words: meta.words, index, irregular, lexicon: new Set(meta.words), rows, mentionedIn,
+    /**
+     * Where `target` (or a form of it that counts) comes among all the words, from guess()'s scores: 1 = the top
+     * guess. Ties go to the earlier word, as in topIndices, so a place of 1-5 always matches the top 5. 0 if the
+     * target isn't a vocabulary word.
+     */
+    place(scores, target) {
+      const ids = variantIds(target);
+      if (!ids.length) return 0;
+      let at = ids[0];
+      for (const i of ids) if (scores[i] > scores[at]) at = i;
+      const s = scores[at];
+      let place = 1;
+      for (let i = 0; i < scores.length; i++) if (scores[i] > s || (scores[i] === s && i < at)) place++;
+      return place;
+    },
     /** Row of word i's k-th sense (for dropRows). */
     senseRow: (i, k) => wordRows + firstSense[i] + k,
     nSense,

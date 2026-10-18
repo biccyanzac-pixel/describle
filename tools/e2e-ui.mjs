@@ -7,10 +7,13 @@ import path from 'node:path';
 import { chromium } from 'playwright-core';
 import { serve } from './serve.mjs';
 import { entryFor, todayKey } from '../site/js/daily.js';
+import { rulesFor } from '../site/js/scoring.js';
 
 const API = process.env.API || 'http://127.0.0.1:8812';
 const schedule = JSON.parse(fs.readFileSync(new URL('../site/data/schedule-v1.json', import.meta.url), 'utf8'));
 const e = entryFor(todayKey(), schedule);
+const RULES = rulesFor(todayKey());
+console.log(`today: ${e.word}, rules ${RULES}`);
 fs.mkdirSync('tools/results', { recursive: true });
 const srv = await serve(8082, { isolate: false });
 const browser = await chromium.launch({ executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true });
@@ -46,7 +49,7 @@ for (const [label, viewport, scheme] of [['phone', { width: 360, height: 780 }, 
 
   // Today's playtest descriptions first (they should get it), then filler.
   const playtests = JSON.parse(fs.readFileSync('data/playtest.json', 'utf8'))[e.word] ?? [];
-  const descriptions = [...playtests.slice().reverse(), 'something you find in everyday life', 'a common thing people know'];
+  const descriptions = [...playtests.slice().reverse(), 'something you find in everyday life', 'a common thing people know', 'an ordinary object or idea'];
   await page.fill('#name', `Tester ${label}`);
   let made = 0;
   for (const d of descriptions) {
@@ -57,7 +60,9 @@ for (const [label, viewport, scheme] of [['phone', { width: 360, height: 780 }, 
     made++;
     await page.waitForFunction((n) => document.querySelectorAll('#history > li').length === n, made, { timeout: 30000 });
     const bars = await page.$$eval('#history > li:last-child .guess-word', (ls) => ls.map((l) => l.textContent));
-    check(`${label}: attempt ${made} shows the top 5`, bars.length === 5, `"${d}" -> ${bars.join(', ')} · ${await page.textContent('#history > li:last-child .attempt-verdict')}`);
+    const said = await page.textContent('#history > li:last-child .attempt-verdict');
+    check(`${label}: attempt ${made} shows the top 5`, bars.length === 5, `"${d}" -> ${bars.join(', ')} · ${said}`);
+    if (RULES === 2) check(`${label}: attempt ${made} shows where the word placed and its points`, /(Got it!|#[\d,]+ of 15,000) .*\d+ pts?/.test(said), said);
     if (made === 1) await page.screenshot({ path: `tools/results/2-attempt-${label}.png`, fullPage: true });
   }
   await page.waitForSelector('#done:not([hidden])', { timeout: 10000 });
@@ -76,6 +81,30 @@ for (const [label, viewport, scheme] of [['phone', { width: 360, height: 780 }, 
   await page.reload();
   await page.waitForSelector('#done:not([hidden])', { timeout: 15000 });
   check(`${label}: progress survives a reload`, await page.isHidden('#play-form'));
+  if (RULES === 2) check(`${label}: all 3 attempts were played`, made === 3, `${made}`);
+
+  // Play again: a replay of today, on its own board.
+  const firstScore = await page.textContent('#score');
+  await page.click('#again');
+  await page.waitForSelector('#play-form:not([hidden])');
+  check(`${label}: play again starts a fresh go`, (await page.$$('#history > li')).length === 0 && /replay/.test(await page.textContent('#daynum')), await page.textContent('#daynum'));
+  for (let i = 0; i < 3 && await page.isVisible('#play-form'); i++) {
+    await page.fill('#text', ['a thing people know about', 'something common', 'you see it often'][i]);
+    await page.click('#guess');
+    await page.waitForFunction((n) => document.querySelectorAll('#history > li').length === n, i + 1, { timeout: 30000 });
+  }
+  await page.waitForSelector('#done:not([hidden])', { timeout: 10000 });
+  check(`${label}: the replay is scored`, /replay/i.test(await page.textContent('#score-caption')), `${await page.textContent('#score-caption')}: ${await page.textContent('#score')}`);
+  await page.waitForTimeout(1500);
+  await page.waitForFunction((n) => /replays/i.test(document.getElementById('board-title').textContent)
+    && [...document.querySelectorAll('#rows .row-name')].some((x) => x.textContent === n), `Tester ${label}`, { timeout: 15000 })
+    .then(() => check(`${label}: on the replay board`, true), () => check(`${label}: on the replay board`, false));
+  await page.screenshot({ path: `tools/results/4-replay-${label}.png`, fullPage: true });
+  await page.click('.board-tab:not(.on)');
+  await page.waitForFunction(() => /Today's leaderboard/.test(document.getElementById('board-title').textContent));
+  await page.waitForFunction((n) => [...document.querySelectorAll('#rows .row-name')].some((x) => x.textContent === n), `Tester ${label}`, { timeout: 15000 })
+    .then(() => check(`${label}: the first-go board still has the first score`, true, firstScore), () => check(`${label}: the first-go board still has the first score`, false));
+  check(`${label}: still no console errors`, errors.length === 0, errors.slice(0, 3).join(' | '));
   await ctx.close();
 }
 await browser.close();

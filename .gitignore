@@ -17,3 +17,4 @@ bench/results/*.log
 bench/results/*.err
 data/*.log
 data/*.err
+backups/
