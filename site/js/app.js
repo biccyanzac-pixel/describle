@@ -136,7 +136,7 @@ function bars(top, target, grow) {
     const hit = isVariant(t.word, target, meta.irregular);
     return el('li', { class: `guess-bar${hit ? ' hit' : ''}` },
       el('span', { class: 'guess-rank', text: `${i + 1}` }),
-      el('span', { class: 'guess-word', text: t.word }),
+      el('span', { class: 'guess-word', text: t.word, title: t.word }),
       el('span', { class: 'bar-track' }, el('span', { class: `bar-fill${hit ? ' good' : ''}`, style: `width:${Math.max(4, (100 * Math.max(0, t.score)) / max).toFixed(0)}%;--i:${i}` })),
       el('span', { class: 'guess-score', text: Math.round(100 * Math.max(0, t.score)) }));
   }));
@@ -166,7 +166,7 @@ function renderHistory() {
       el('div', { class: 'attempt-head' },
         el('span', { class: 'attempt-label', text: `Attempt ${i + 1} · ${plural(a.words, 'word')}` }),
         el('span', { class: `attempt-verdict ${v.cls}`, text: v.text })),
-      el('p', { class: 'attempt-answer', text: `“${a.text}”` }),
+      el('p', { class: 'attempt-answer', dir: 'auto', text: `“${a.text}”` }),
       bars(a.top, e.word, i === fresh));
   }));
 }
@@ -359,8 +359,9 @@ function boardTitle(view) {
 
 function rowSub(r) {
   const two = rulesFor(mode.day) === 2;
-  const squares = r.ranks.map((x) => squareFor(two ? { place: x } : { rank: x }, mode.day)).join('');
-  const what = two ? (r.ranks.length ? ` · ${r.ranks.map((p) => `#${p}`).join(' ')}` : '') + (r.finished ? '' : ' · playing')
+  const ranks = r.ranks || [];
+  const squares = ranks.map((x) => squareFor(two ? { place: x } : { rank: x }, mode.day)).join('');
+  const what = two ? (ranks.length ? ` · ${ranks.map((p) => `#${p}`).join(' ')}` : '') + (r.finished ? '' : ' · playing')
     : r.solved ? ` · ${plural(r.words, 'word')}` : r.finished ? ' · not guessed' : ' · playing';
   return `${squares}${what}${r.runs > 1 ? ` · best of ${r.runs}` : ''}`;
 }
@@ -389,9 +390,9 @@ async function renderBoard() {
     : el('li', { class: `row${r.you ? ' me' : ''}` },
       el('span', { class: 'row-rank', text: `${r.rank}` }),
       el('div', { class: 'row-main' },
-        el('div', { class: 'row-name', text: r.name }),
+        el('div', { class: 'row-name', dir: 'auto', title: r.name || '', text: r.name || '?' }),
         el('div', { class: 'row-sub' }, el('span', { class: 'row-emoji', text: rowSub(r) }))),
-      el('span', { class: 'row-score', text: `${r.score}` }))));
+      el('span', { class: 'row-score', text: `${r.score ?? ''}` }))));
   $('board-empty').textContent = view === 'day' ? (isToday() ? 'Nobody has played yet today. Be the first.' : 'Nobody played on the day.')
     : view === 'replay' ? 'No replays yet: finish your go, then "Play again".' : 'Nobody has played this day later yet.';
   show('board-empty', !b.top.length);
