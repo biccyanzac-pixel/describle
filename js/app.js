@@ -285,7 +285,8 @@ async function guess() {
   try {
     // The AI runs on the main thread and blocks it for the whole guess: let "Thinking…" and the spinner paint first
     // (one frame), so the spinner, a transform animation, keeps turning on the compositor meanwhile.
-    await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 0)));
+    // (A hidden tab never runs rAF, so a 50 ms timer also lets it go on.)
+    await new Promise((r) => { requestAnimationFrame(() => setTimeout(r, 0)); setTimeout(r, 50); });
     const q = await ai.embedder.embed(text);
     // The AI never guesses a word the description itself uses (docs/vocab.md, "Mentioned words").
     const g = ai.vocab.guess(q, 5, { mentioned: text });
