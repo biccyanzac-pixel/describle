@@ -97,6 +97,7 @@ textarea {
   border: 1px solid var(--border);
   border-radius: 10px;
   resize: vertical;
+  box-sizing: border-box; /* also without the kit's reset */
 }
 
 input[type="text"]:focus-visible,
@@ -180,6 +181,7 @@ textarea:focus-visible,
   background: color-mix(in srgb, var(--bad) 12%, transparent);
   border: 1px solid color-mix(in srgb, var(--bad) 35%, transparent);
   border-radius: 10px;
+  overflow-wrap: anywhere;
 }
 
 /* --- result --- */
@@ -227,7 +229,7 @@ textarea:focus-visible,
 
 .row {
   display: grid;
-  grid-template-columns: 1.75rem minmax(0, 1fr) auto;
+  grid-template-columns: minmax(1.75rem, auto) minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.75rem;
   padding: 0.6rem 0.65rem;
@@ -391,6 +393,7 @@ textarea:focus-visible,
   margin: 0.9rem 0 0;
   font-size: 0.82rem;
   color: var(--muted);
+  overflow-wrap: anywhere;
 }
 
 /* Reduce motion: the spinners pulse (opacity) instead of turning, so "busy" still shows without movement. */
@@ -510,7 +513,7 @@ textarea:focus-visible,
 
 .archive-browse {
   background: var(--accent);
-  color: var(--accent-contrast, #111);
+  color: #fff;
   border: none;
   border-radius: 0.5rem;
   padding: 0.5rem 1rem;
@@ -540,7 +543,7 @@ textarea:focus-visible,
   flex-direction: column;
   gap: 0.15rem;
   text-align: left;
-  background: var(--panel);
+  background: var(--surface-2);
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: 0.5rem;
@@ -566,6 +569,7 @@ textarea:focus-visible,
 .archive-list-prompt {
   font-size: 0.9rem;
   color: var(--muted);
+  overflow-wrap: anywhere;
 }
 
 .archive-list-empty {
@@ -620,15 +624,13 @@ a { color: var(--accent); }
 
 .share { width: 100%; margin-top: 1.1rem; }
 
-.row-emoji { font-size: 0.8rem; letter-spacing: 0.05em; }
+.row-emoji { font-size: 0.8rem; letter-spacing: 0.05em; overflow-wrap: anywhere; }
 
 .row-sub { font-size: 0.8rem; color: var(--muted); }
 
 .footer p + p { margin-top: 0.35rem; }
 
 .footer a { color: var(--muted); }
-
-.archive-list-item { background: var(--surface-2); }
 
 .chips {
   list-style: none;
@@ -646,6 +648,8 @@ a { color: var(--accent); }
   border-radius: 999px;
   background: var(--surface-2);
   border: 1px solid var(--border);
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .chip.done { opacity: 0.5; text-decoration: line-through; }
@@ -757,25 +761,25 @@ input#name { font-size: 16px; }
 }
 .reveal .label { display: block; }
 .reveal .label + * { margin-top: 0.2rem; }
-.reveal p { margin: 0; }
+.reveal p { margin: 0; overflow-wrap: anywhere; }
 .reveal-word { font-size: 1.15rem; }
 .reveal-def { margin-bottom: 0.7rem !important; color: var(--text); }
 .reveal-banned { color: var(--muted); }
 
 /* footer credits */
 .credits { margin-top: 0.6rem; font-size: 0.8rem; color: var(--muted); text-align: left; }
-.credits summary { cursor: pointer; text-align: center; }
+.credits summary { cursor: pointer; text-align: center; -webkit-user-select: none; user-select: none; transition: opacity 80ms var(--jgg-ease-out, cubic-bezier(0.23, 1, 0.32, 1)); }
+.credits summary:active { opacity: 0.6; transition-duration: var(--jgg-t-press, 120ms); }
 .credits p { margin: 0.5rem 0 0 !important; }
 
 @media (max-width: 420px) {
   .card { padding: 1.15rem; }
   .guess-bar { grid-template-columns: 1rem minmax(4.5rem, 7rem) minmax(0, 1fr) 1.8rem; gap: 0.4rem; }
 }
-.archive-browse { color: #fff; }
 
 /* play again, and the board tabs (first goes / replays / played later) */
 .again { margin-top: 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.35rem; }
-.board-tabs { display: flex; gap: 0.4rem; margin: 0 0 0.6rem; }
+.board-tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 0.6rem; }
 .board-tabs:empty { display: none; }
 .board-tab {
   padding: 0.3rem 0.75rem;
