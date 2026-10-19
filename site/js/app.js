@@ -26,6 +26,17 @@ let ai = null;         // { embedder, vocab } once loaded
 let mode = { day: todayKey(), board: 'day' };
 let boardView = 'day'; // which of the day's boards the leaderboard card shows
 let busy = false;
+// Motion (jacob.gg docs/motion-system.md): only what's new animates, never a re-render or a reload.
+let freshRow = -1;     // index of the attempt just made: its row enters and its bars grow
+let justDone = false;  // the guess that just finished the day: the result reveals and the score settles
+const motion = () => window.JGG?.motion;
+const calm = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { return false; } };
+const scrollTo = (n, block) => {
+  if (!n) return;
+  const m = motion();
+  if (m?.scroll) m.scroll(n, { block });
+  else n.scrollIntoView({ block, behavior: calm() ? 'auto' : 'smooth' });
+};
 
 function el(tag, props = {}, ...children) {
   const n = document.createElement(tag);
@@ -55,7 +66,7 @@ async function loadAI() {
   const bytes = { model: [0, 24e6], vocab: [0, 9.6e6] };
   const progress = () => {
     const loaded = bytes.model[0] + bytes.vocab[0], total = bytes.model[1] + bytes.vocab[1];
-    $('loading-bar').style.width = `${Math.min(100, (100 * loaded) / total).toFixed(1)}%`;
+    $('loading-bar').style.transform = `scaleX(${Math.min(1, loaded / total).toFixed(3)})`;
     $('loading-text').textContent = `Loading the AI… ${Math.round(loaded / 1e6)} of ${Math.round(total / 1e6)} MB`;
   };
   try {
@@ -67,7 +78,7 @@ async function loadAI() {
     await embedder.embed('warm up');
     ai = { embedder, vocab };
     try { sessionStorage.removeItem(RELOAD_FLAG); } catch { /* ignore */ }
-    show('loading', false);
+    dropLoading();
     renderPlay();
   } catch (e) {
     console.error(e);
@@ -84,6 +95,14 @@ async function loadAI() {
     $('load-error-text').textContent = `Couldn't load the AI${e?.stage ? ` (${e.stage})` : ''}: ${e?.message || e}. `;
     show('load-error', true);
   }
+}
+
+/** Loading -> play: the loading panel fades out while the form takes its place (one 220 ms swap). The form stays
+ * usable throughout; if the player is already typing, nothing blinks: the panel just goes. */
+function dropLoading() {
+  const ld = $('loading'), form = $('play-form'), m = motion();
+  if (m?.swap && !form.hidden && !$('text').value && document.activeElement !== $('text')) m.swap(ld, form);
+  else ld.hidden = true;
 }
 
 // --- rendering ------------------------------------------------------------------------------------
@@ -111,14 +130,14 @@ function render() {
   renderBoard();
 }
 
-function bars(top, target) {
+function bars(top, target, grow) {
   const max = Math.max(...top.map((t) => t.score), 0.01);
-  return el('ol', { class: 'guess-bars' }, ...top.map((t, i) => {
+  return el('ol', { class: `guess-bars${grow ? ' grow' : ''}` }, ...top.map((t, i) => {
     const hit = isVariant(t.word, target, meta.irregular);
     return el('li', { class: `guess-bar${hit ? ' hit' : ''}` },
       el('span', { class: 'guess-rank', text: `${i + 1}` }),
       el('span', { class: 'guess-word', text: t.word }),
-      el('span', { class: 'bar-track' }, el('span', { class: `bar-fill${hit ? ' good' : ''}`, style: `width:${Math.max(4, (100 * Math.max(0, t.score)) / max).toFixed(0)}%` })),
+      el('span', { class: 'bar-track' }, el('span', { class: `bar-fill${hit ? ' good' : ''}`, style: `width:${Math.max(4, (100 * Math.max(0, t.score)) / max).toFixed(0)}%;--i:${i}` })),
       el('span', { class: 'guess-score', text: Math.round(100 * Math.max(0, t.score)) }));
   }));
 }
@@ -139,15 +158,16 @@ function verdict(a, target) {
 }
 
 function renderHistory() {
-  const e = entry();
+  const e = entry(), fresh = freshRow;
+  freshRow = -1;
   $('history').replaceChildren(...attempts().map((a, i) => {
     const v = verdict(a, e.word);
-    return el('li', { class: 'attempt-row' },
+    return el('li', { class: `attempt-row${i === fresh ? ' fresh' : ''}` },
       el('div', { class: 'attempt-head' },
         el('span', { class: 'attempt-label', text: `Attempt ${i + 1} · ${plural(a.words, 'word')}` }),
         el('span', { class: `attempt-verdict ${v.cls}`, text: v.text })),
       el('p', { class: 'attempt-answer', text: `“${a.text}”` }),
-      bars(a.top, e.word));
+      bars(a.top, e.word, i === fresh));
   }));
 }
 
@@ -212,12 +232,19 @@ function banCheck() {
 function renderDone() {
   const list = attempts();
   const r = result();
+  const reveal = justDone;
+  justDone = false;
   show('done', r.finished);
   if (!r.finished) return;
   const e = entry();
   const { day, board } = mode;
   $('score-caption').textContent = board === 'late' ? `Your replay of ${day}` : board === 'replay' ? "Your replay of today's word" : "Today's score";
-  $('score').textContent = r.score;
+  // Just finished: the score counts up (any tap skips it) and the result reveals; share, play again, the rating and
+  // the board are there at once. A reload or re-render shows the final value with no motion.
+  const m = motion();
+  if (reveal) $('score').textContent = '0';
+  if (m?.settle) m.settle($('score'), r.score, { from: reveal ? 0 : r.score, format: (v) => String(Math.round(v * 10) / 10) });
+  else $('score').textContent = r.score;
   $('score').className = `score${r.score > 0 ? ' good' : ' bad'}`;
   if (r.rules === 2) {
     const best = r.best?.points > 0 ? ` · best: #${r.best.place} in ${plural(r.best.words, 'word')}` : '';
@@ -235,6 +262,7 @@ function renderDone() {
     : `It goes on today's replay board; your first go stays on the main one.`;
   if (board !== 'late' && window.JGG?.rate) window.JGG.rate({ game: 'describle', day, mount: $('rate') });
   else $('rate').replaceChildren();
+  if (reveal) m?.reveal?.([$('score'), $('squares'), $('done').querySelector('.reveal')]);
 }
 
 // --- playing --------------------------------------------------------------------------------------
@@ -262,6 +290,7 @@ async function guess() {
     const rank = top.findIndex((t) => isVariant(t.word, e.word, meta.irregular)) + 1;
     const place = ai.vocab.place(g.scores, e.word) || null;
     const index = attempts().length;
+    freshRow = index;
     store.addAttempt(mode.day, mode.board, { text, words, rank, place, top });
     submit(index, text, top, place);
     $('text').value = '';
@@ -274,12 +303,13 @@ async function guess() {
     $('guess').classList.remove('busy');
   }
   $('daynum').textContent = `Describle #${e.number}${goLabel()}`;
+  justDone = freshRow >= 0 && result().finished;
   renderHistory();
   renderPlay();
   renderDone();
   const rows = $('history').children;
-  rows[rows.length - 1]?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  if (result().finished) $('done').scrollIntoView({ block: 'start', behavior: 'smooth' });
+  if (result().finished) scrollTo($('done'), 'start');
+  else scrollTo(rows[rows.length - 1], 'nearest');
 }
 
 function submit(attempt, text, top, place) {
@@ -298,7 +328,7 @@ function playAgain() {
   mode = { day: mode.day, board };
   boardView = board;
   render();
-  $('card').scrollIntoView({ block: 'start', behavior: 'smooth' });
+  scrollTo($('card'), 'start');
   $('text').focus({ preventScroll: true });
 }
 
@@ -393,7 +423,8 @@ async function browseArchive() {
         s?.players ? `${s.players} played on the day, best ${s.top}` : 'Nobody played on the day',
         mine !== null ? `you: ${mine}` : null].filter(Boolean).join(' · ') })));
   }) : [el('li', { class: 'archive-list-empty', text: 'No past days yet: Describle started today.' })]));
-  list.hidden = false;
+  const m = motion();
+  if (m?.enter) m.enter(list); else list.hidden = false;
 }
 
 function openArchive(d) {
@@ -403,7 +434,7 @@ function openArchive(d) {
   $('archive-list').hidden = true;
   checkCache = null;
   render();
-  $('card').scrollIntoView({ block: 'start', behavior: 'smooth' });
+  scrollTo($('card'), 'start');
 }
 
 // --- boot -----------------------------------------------------------------------------------------
